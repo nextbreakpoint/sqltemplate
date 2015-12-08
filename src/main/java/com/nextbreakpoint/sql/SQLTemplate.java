@@ -26,7 +26,7 @@ public class SQLTemplate {
 	}
 
 	public Try<SQLTemplate> execute(SQLCommand cmd) {
-		return cmd.apply(this).flatMap(sql -> Try.success(sql));
+		return cmd.apply(this);
 	}
 
 	public Try<SQLTemplate> autoCommit() {

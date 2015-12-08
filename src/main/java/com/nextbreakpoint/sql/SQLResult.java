@@ -74,7 +74,7 @@ public abstract class SQLResult {
 
 			@Override
 			public int characteristics() {
-				return Spliterator.IMMUTABLE;
+				return Spliterator.IMMUTABLE | Spliterator.NONNULL;
 			}
 		}
 	}
@@ -114,7 +114,7 @@ public abstract class SQLResult {
 
 			@Override
 			public int characteristics() {
-				return Spliterator.IMMUTABLE;
+				return Spliterator.IMMUTABLE | Spliterator.SIZED | Spliterator.NONNULL;
 			}
 		}
 	}
