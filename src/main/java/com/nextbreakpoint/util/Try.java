@@ -1,4 +1,4 @@
-package com.nextbreakpoint;
+package com.nextbreakpoint.util;
 
 import java.util.NoSuchElementException;
 import java.util.Objects;

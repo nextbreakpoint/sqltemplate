@@ -15,9 +15,9 @@ import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.ExpectedException;
 
-import com.nextbreakpoint.Try;
 import com.nextbreakpoint.sql.SQLCommand;
 import com.nextbreakpoint.sql.SQLTemplate;
+import com.nextbreakpoint.util.Try;
 
 public class SQLTemplateIT {
 	@Rule

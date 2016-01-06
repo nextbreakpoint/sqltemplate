@@ -6,7 +6,7 @@ import java.util.Optional;
 import java.util.function.Function;
 import java.util.stream.Stream;
 
-import com.nextbreakpoint.Try;
+import com.nextbreakpoint.util.Try;
 
 public class SQLTemplate {
 	private final Connection conn;

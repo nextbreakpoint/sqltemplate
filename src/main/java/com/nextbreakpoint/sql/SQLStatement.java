@@ -4,7 +4,7 @@ import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.util.Objects;
 
-import com.nextbreakpoint.Try;
+import com.nextbreakpoint.util.Try;
 
 public class SQLStatement {
 	private final PreparedStatement st;
