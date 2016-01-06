@@ -6,7 +6,7 @@ The code is designed using a functional approach and it requires Java 8.
 
 ## Example
 
-Given this Java code:
+Given the program:
 
 	public class SQLTemplateMain {
 		public static void main(String[] args) {
