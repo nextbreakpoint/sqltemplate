@@ -104,15 +104,15 @@ public class SQLTemplate {
 		return new SQLTemplate(conn);
 	}
 
-	public static Function<Exception, SQLTemplateException> exception() {
-		return e -> (e instanceof SQLTemplateException) ? (SQLTemplateException)e : new SQLTemplateException("SQL template error", e);
-	}
-
 	public static <T> Try<T, SQLTemplateException> success(T template) {
-		return Try.success(SQLTemplate.exception(), template);
+		return Try.success(wrapException(), template);
 	}
 
 	public static <T> Try<T, SQLTemplateException> failure(Exception exception) {
-		return Try.failure(SQLTemplate.exception(), SQLTemplate.exception().apply(exception));
+		return Try.failure(wrapException(), wrapException().apply(exception));
+	}
+
+	private static Function<Exception, SQLTemplateException> wrapException() {
+		return e -> (e instanceof SQLTemplateException) ? (SQLTemplateException)e : new SQLTemplateException("SQL template error", e);
 	}
 }
