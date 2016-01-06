@@ -1,7 +1,9 @@
 # SQLTemplate
 
-SQLTemplate is a helper class to execute SQL statements in Java language. 
+SQLTemplate is a helper class to execute SQL statements in Java language.
+
 SQLTemplate is a wrapper of standard JDBC API using a fluent interface.
+
 The code is designed using a functional approach and it requires Java 8.
 
 ## Example
