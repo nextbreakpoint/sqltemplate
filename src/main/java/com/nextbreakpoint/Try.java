@@ -1,67 +1,103 @@
 package com.nextbreakpoint;
 
 import java.util.NoSuchElementException;
+import java.util.Objects;
+import java.util.Optional;
 import java.util.function.Consumer;
 import java.util.function.Function;
 
-public abstract class Try<V> {
-	private Try() {}
+public abstract class Try<V, E extends Throwable> {
+    protected final Function<Exception, E> expFunc;  
+    
+	private Try(Function<Exception, E> expFunc) {
+	    this.expFunc = expFunc;
+	}
 
 	public abstract Boolean isSuccess();
 
 	public abstract Boolean isFailure();
 
-	public abstract void throwException();
+	public abstract void throwException() throws E;
 	
 	public abstract void ifPresent(Consumer<V> c);
 
-	public abstract void ifPresentOrThrow(Consumer<V> c);
+	public abstract void ifPresentOrThrow(Consumer<V> c) throws E;
 
-	public abstract <R> Try<R> map(Function<V, R> func);
+	public abstract <R> Try<R, E> map(Function<V, R> func);
 
-	public abstract <R> Try<R> flatMap(Function<V, Try<R>> func);
+	public abstract <R> Try<R, E> flatMap(Function<V, Try<R, E>> func);
 
 	public abstract boolean isPresent();
 
 	public abstract V get();
 
-	public static <V> Try<V> empty() {
-		return Try.success(null);
+    public V getOrElse(V value) {
+        if (isPresent()) {
+            return get();
+        } else {
+            return value;
+        }
+    }
+
+    public Optional<V> value() {
+        if (isPresent()) {
+            return Optional.of(get());
+        } else {
+            return Optional.empty();
+        }
+    }
+
+    public Try<V, E> orElseTry(Block<V> block) {
+        if (!isPresent()) {
+            try {
+                return Try.success(expFunc, block.run());   
+            } catch (Exception e) {
+                return Try.failure(expFunc, expFunc.apply(e));
+            }
+        } else {
+            return this;
+        }
+    }
+
+    public V getOrThrow() throws E {
+        if (isFailure()) {
+            throwException();
+        }
+        return get();
+    }
+
+	public static <V, E extends Throwable> Try<V, E> empty(Function<Exception, E> expFunc) {
+		return Try.success(expFunc, null);
 	}
 
-	public static <V> Try<V> ofNullable(V value) {
-		return Try.success(value);
+	public static <V, E extends Throwable> Try<V, E> ofNullable(Function<Exception, E> expFunc, V value) {
+		return Try.success(expFunc, value);
 	}
 
-	public static <V> Try<V> failure(String message) {
-		return new Failure<>(message);
+    public static <V, E extends Throwable> Try<V, E> of(Function<Exception, E> expFunc, V value) {
+        Objects.requireNonNull(value);
+        return Try.success(expFunc, value);
+    }
+
+    public static <V, E extends Throwable> Try<V, E> failure(Function<Exception, E> expFunc, E e) {
+		return new Failure<>(expFunc, e);
 	}
 
-	public static <V> Try<V> failure(String message, Exception e) {
-		return new Failure<>(message, e);
+    public static <V, E extends Throwable> Try<V, E> success(Function<Exception, E> expFunc, V value) {
+		return new Success<>(expFunc, value);
 	}
 
-	public static <V> Try<V> failure(Exception e) {
-		return new Failure<>(e);
-	}
+	@FunctionalInterface
+    public interface Block<R> {
+        public R run() throws Exception;
+    }
+    
+    private static class Failure<V, E extends Throwable> extends Try<V, E> {
+		private E exception;
 
-	public static <V> Try<V> success(V value) {
-		return new Success<>(value);
-	}
-
-	private static class Failure<V> extends Try<V> {
-		private RuntimeException exception;
-
-		public Failure(String message) {
-			this.exception = new IllegalStateException(message);
-		}
-
-		public Failure(String message, Exception e) {
-			this.exception = (e instanceof RuntimeException) ? (RuntimeException)e : new IllegalStateException(message, e);
-		}
-		
-		public Failure(Exception e) {
-			this.exception = (e instanceof RuntimeException) ? (RuntimeException)e : new IllegalStateException(e);
+		public Failure(Function<Exception, E> expFunc, E e) {
+		    super(expFunc);
+			this.exception = e;
 		}
 
 		@Override
@@ -75,22 +111,22 @@ public abstract class Try<V> {
 		}
 
 		@Override
-		public void throwException() {
+		public void throwException() throws E {
 			throw this.exception;
 		}
 
-		public <R> Try<R> map(Function<V, R> func) {
-			return Try.failure(exception);
+		public <R> Try<R, E> map(Function<V, R> func) {
+			return Try.failure(expFunc, exception);
 		}
 
-		public <R> Try<R> flatMap(Function<V, Try<R>> func) {
-			return Try.failure(exception);
+		public <R> Try<R, E> flatMap(Function<V, Try<R, E>> func) {
+			return Try.failure(expFunc, exception);
 		}
 
 		public void ifPresent(Consumer<V> c) {
 		}
 
-		public void ifPresentOrThrow(Consumer<V> c) {
+		public void ifPresentOrThrow(Consumer<V> c) throws E {
 			throw exception;
 		}
 		
@@ -103,10 +139,11 @@ public abstract class Try<V> {
 		}
 	}
 
-	private static class Success<V> extends Try<V> {
+	private static class Success<V, E extends Throwable> extends Try<V, E> {
 		private V value;
 
-		public Success(V value) {
+		public Success(Function<Exception, E> expFunc, V value) {
+            super(expFunc);
 			this.value = value;
 		}
 
@@ -124,23 +161,23 @@ public abstract class Try<V> {
 		public void throwException() {
 		}
 		
-		public <R> Try<R> map(Function<V, R> func) {
+		public <R> Try<R, E> map(Function<V, R> func) {
 			try {
-				return Try.ofNullable(func.apply(value));
+				return Try.ofNullable(expFunc, func.apply(value));
 			} catch (Exception e) {
-				return Try.failure(e);
+				return Try.failure(expFunc, expFunc.apply(e));
 			}
 		}
 
-		public <R> Try<R> flatMap(Function<V, Try<R>> func) {
+		public <R> Try<R, E> flatMap(Function<V, Try<R, E>> func) {
 			try {
 				if (value != null) {
 					return func.apply(value);
 				} else {
-					return Try.empty();
+					return Try.empty(expFunc);
 				}
 			} catch (Exception e) {
-				return Try.failure(e);
+				return Try.failure(expFunc, expFunc.apply(e));
 			}
 		}
 

@@ -19,8 +19,7 @@ public class SQLTemplateMain {
 
 	private static void run() throws Exception {
 		try (Connection conn = DriverManager.getConnection("jdbc:h2:~/test", "sa", "")) {
-			SQLCommand cmd = SQLCommand.empty()
-				.andThen(sql -> sql.noAutoCommit()) 
+			SQLCommand cmd = SQLCommand.begin(sql -> sql.noAutoCommit()) 
 				.andThen(sql -> sql.prepareStatement("CREATE TABLE IF NOT EXISTS TEST(ID INT PRIMARY KEY, NAME VARCHAR(255) DEFAULT '')")) 
 				.andThen(sql -> sql.execute()) 
 				.andThen(sql -> sql.prepareStatement("DELETE TEST")) 

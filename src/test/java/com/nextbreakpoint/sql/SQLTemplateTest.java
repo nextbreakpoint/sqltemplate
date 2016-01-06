@@ -49,31 +49,25 @@ public class SQLTemplateTest {
 	}
 
 	@Test
-	public void execute_givenCommandIsEmpty_shouldReturnSQL() {
-		Connection conn = mock(Connection.class);
-		SQLTemplate.create(conn).execute(SQLCommand.empty());
-	}
-
-	@Test
 	public void execute_givenCommandIsNotEmpty_shouldCallCommand() {
 		Connection conn = mock(Connection.class);
 		SQLCommand cmd = mock(SQLCommand.class);
-		when(cmd.apply(any(SQLTemplate.class))).thenReturn(Try.success(SQLTemplate.create(conn)));
-		SQLTemplate.create(conn).execute(SQLCommand.empty().andThen(cmd));
+		when(cmd.apply(any(SQLTemplate.class))).thenReturn(SQLTemplate.success(SQLTemplate.create(conn)));
+		SQLTemplate.create(conn).execute(SQLCommand.begin(cmd));
 		verify(cmd, times(1)).apply(any(SQLTemplate.class));
 	}
 
 	@Test
 	public void execute_givenCommandIsNoAutoCommit_shouldSetAutoCommitToFalse() throws Exception {
 		Connection conn = mock(Connection.class);
-		SQLTemplate.create(conn).execute(SQLCommand.empty().andThen(sql -> sql.noAutoCommit()));
+		SQLTemplate.create(conn).execute(SQLCommand.begin(sql -> sql.noAutoCommit()));
 		verify(conn, times(1)).setAutoCommit(false);
 	}
 
 	@Test
 	public void execute_givenCommandIsAutoCommit_shouldSetAutoCommitToTrue() throws Exception {
 		Connection conn = mock(Connection.class);
-		SQLTemplate.create(conn).execute(SQLCommand.empty().andThen(sql -> sql.autoCommit()));
+		SQLTemplate.create(conn).execute(SQLCommand.begin(sql -> sql.autoCommit()));
 		verify(conn, times(1)).setAutoCommit(true);
 	}
 
@@ -81,7 +75,7 @@ public class SQLTemplateTest {
 	public void execute_givenCommandIsPrepareStatement_shouldCallPrepareStatement() throws Exception {
 		Connection conn = mock(Connection.class);
 		String stmtSql = "select * from test";
-		SQLTemplate.create(conn).execute(SQLCommand.empty().andThen(sql -> sql.prepareStatement(stmtSql)));
+		SQLTemplate.create(conn).execute(SQLCommand.begin(sql -> sql.prepareStatement(stmtSql)));
 		verify(conn, times(1)).prepareStatement(stmtSql);
 	}
 
@@ -91,7 +85,7 @@ public class SQLTemplateTest {
 		PreparedStatement stmt = mock(PreparedStatement.class);
 		String stmtSql = "delete from test";
 		when(conn.prepareStatement(stmtSql)).thenReturn(stmt);
-		SQLTemplate.create(conn).execute(SQLCommand.empty().andThen(sql -> sql.prepareStatement(stmtSql)).andThen(sql -> sql.execute()));
+		SQLTemplate.create(conn).execute(SQLCommand.begin(sql -> sql.prepareStatement(stmtSql)).andThen(sql -> sql.execute()));
 		verify(stmt, times(1)).executeUpdate();
 	}
 
@@ -101,7 +95,7 @@ public class SQLTemplateTest {
 		PreparedStatement stmt = mock(PreparedStatement.class);
 		String stmtSql = "select * from test";
 		when(conn.prepareStatement(stmtSql)).thenReturn(stmt);
-		SQLTemplate.create(conn).execute(SQLCommand.empty().andThen(sql -> sql.prepareStatement(stmtSql)).andThen(sql -> sql.executeQuery()));
+		SQLTemplate.create(conn).execute(SQLCommand.begin(sql -> sql.prepareStatement(stmtSql)).andThen(sql -> sql.executeQuery()));
 		verify(stmt, times(1)).executeQuery();
 	}
 
@@ -112,7 +106,7 @@ public class SQLTemplateTest {
 		String stmtSql = "select * from test";
 		when(conn.prepareStatement(stmtSql)).thenReturn(stmt);
 		when(stmt.executeUpdate()).thenReturn(1);
-		SQLTemplate.create(conn).execute(SQLCommand.empty().andThen(sql -> sql.prepareStatement(stmtSql)).andThen(sql -> sql.execute()).andThen(sql -> sql.commit()));
+		SQLTemplate.create(conn).execute(SQLCommand.begin(sql -> sql.prepareStatement(stmtSql)).andThen(sql -> sql.execute()).andThen(sql -> sql.commit()));
 		verify(conn, times(1)).commit();
 	}
 
@@ -123,18 +117,30 @@ public class SQLTemplateTest {
 		String stmtSql = "select * from test";
 		when(conn.prepareStatement(stmtSql)).thenReturn(stmt);
 		when(stmt.executeUpdate()).thenReturn(1);
-		SQLTemplate.create(conn).execute(SQLCommand.empty().andThen(sql -> sql.prepareStatement(stmtSql)).andThen(sql -> sql.execute()).andThen(sql -> sql.rollback()));
+		SQLTemplate.create(conn).execute(SQLCommand.begin(sql -> sql.prepareStatement(stmtSql)).andThen(sql -> sql.execute()).andThen(sql -> sql.rollback()));
 		verify(conn, times(1)).rollback();
 	}
 
 	@Test
-	public void execute_givenCommandIsEmpty_shouldReturnEmptyStream() throws Exception {
+	public void execute_givenCommandReturnsFailure_shouldNotHaveResult() throws Exception {
 		Connection conn = mock(Connection.class);
 		PreparedStatement stmt = mock(PreparedStatement.class);
 		String stmtSql = "select * from test";
 		when(conn.prepareStatement(stmtSql)).thenReturn(stmt);
 		when(stmt.executeUpdate()).thenReturn(10);
-		Try<Stream<Object[]>> tryStream = SQLTemplate.create(conn).execute(SQLCommand.empty()).flatMap(sql -> Try.success(sql.stream()));
+		Try<Stream<Object[]>, SQLTemplateException> tryStream = SQLTemplate.create(conn).execute(SQLCommand.begin(sql -> SQLTemplate.failure(new Exception()))).flatMap(sql -> SQLTemplate.success(sql.stream()));
+		assertTrue(tryStream.isFailure());
+		assertTrue(!tryStream.isPresent());
+	}
+
+	@Test
+	public void execute_givenCommandReturnsSuccess_shouldReturnEmptyStream() throws Exception {
+		Connection conn = mock(Connection.class);
+		PreparedStatement stmt = mock(PreparedStatement.class);
+		String stmtSql = "select * from test";
+		when(conn.prepareStatement(stmtSql)).thenReturn(stmt);
+		when(stmt.executeUpdate()).thenReturn(10);
+		Try<Stream<Object[]>, SQLTemplateException> tryStream = SQLTemplate.create(conn).execute(SQLCommand.begin(sql -> SQLTemplate.success(sql))).flatMap(sql -> SQLTemplate.success(sql.stream()));
 		assertTrue(tryStream.isSuccess());
 		assertNotNull(tryStream.get());
 		assertEquals(0L, tryStream.get().count());
@@ -147,7 +153,7 @@ public class SQLTemplateTest {
 		String stmtSql = "select * from test";
 		when(conn.prepareStatement(stmtSql)).thenReturn(stmt);
 		when(stmt.executeUpdate()).thenReturn(10);
-		Try<Stream<Object[]>> tryStream = SQLTemplate.create(conn).execute(SQLCommand.empty().andThen(sql -> sql.prepareStatement(stmtSql)).andThen(sql -> sql.execute())).flatMap(sql -> Try.success(sql.stream()));
+		Try<Stream<Object[]>, SQLTemplateException> tryStream = SQLTemplate.create(conn).execute(SQLCommand.begin(sql -> sql.prepareStatement(stmtSql)).andThen(sql -> sql.execute())).flatMap(sql -> SQLTemplate.success(sql.stream()));
 		assertTrue(tryStream.isSuccess());
 		assertNotNull(tryStream.get());
 		assertEquals(10L, tryStream.get().findFirst().get()[0]);
@@ -168,7 +174,7 @@ public class SQLTemplateTest {
 		when(rs.getMetaData()).thenReturn(meta);
 		when(rs.getObject(1)).thenReturn(1L);
 		when(rs.getObject(2)).thenReturn("a");
-		Try<Stream<Object[]>> tryStream = SQLTemplate.create(conn).execute(SQLCommand.empty().andThen(sql -> sql.prepareStatement(stmtSql)).andThen(sql -> sql.executeQuery())).flatMap(sql -> Try.success(sql.stream()));
+		Try<Stream<Object[]>, SQLTemplateException> tryStream = SQLTemplate.create(conn).execute(SQLCommand.begin(sql -> sql.prepareStatement(stmtSql)).andThen(sql -> sql.executeQuery())).flatMap(sql -> SQLTemplate.success(sql.stream()));
 		assertTrue(tryStream.isSuccess());
 		assertNotNull(tryStream.get());
 		Optional<Object[]> findFirst = tryStream.get().findFirst();

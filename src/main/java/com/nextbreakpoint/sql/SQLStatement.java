@@ -21,21 +21,21 @@ public class SQLStatement {
 		}
 	}
 
-	public Try<Integer> execute(Object[] params) {
+	public Try<Integer, SQLTemplateException> execute(Object[] params) {
 		try {
 			bindParameters(params);
-			return Try.success(st.executeUpdate());
+			return SQLTemplate.success(st.executeUpdate());
 		} catch (Exception e) {
-			return Try.failure(e);
+			return SQLTemplate.failure(e);
 		}
 	}
 
-	public Try<ResultSet> executeQuery(Object[] params) {
+	public Try<ResultSet, SQLTemplateException> executeQuery(Object[] params) {
 		try {
 			bindParameters(params);
-			return Try.success(st.executeQuery());
+			return SQLTemplate.success(st.executeQuery());
 		} catch (Exception e) {
-			return Try.failure(e);
+			return SQLTemplate.failure(e);
 		}
 	}
 

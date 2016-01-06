@@ -49,8 +49,7 @@ public class SQLTemplateIT {
 
 	@Test
 	public void get_givenCommandIsNotEmpty_shouldReturnAValue() throws Exception {
-		SQLCommand cmd = SQLCommand.empty()
-				.andThen(sql -> sql.noAutoCommit()) 
+		SQLCommand cmd = SQLCommand.begin(sql -> sql.noAutoCommit()) 
 				.andThen(sql -> sql.prepareStatement("CREATE TABLE IF NOT EXISTS TEST(ID INT PRIMARY KEY, NAME VARCHAR(255) DEFAULT '')")) 
 				.andThen(sql -> sql.execute()) 
 				.andThen(sql -> sql.prepareStatement("DELETE TEST")) 

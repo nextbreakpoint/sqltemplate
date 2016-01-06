@@ -3,6 +3,7 @@ package com.nextbreakpoint.sql;
 import java.sql.Connection;
 import java.util.Objects;
 import java.util.Optional;
+import java.util.function.Function;
 import java.util.stream.Stream;
 
 import com.nextbreakpoint.Try;
@@ -25,73 +26,73 @@ public class SQLTemplate {
 		this.sqlStatement = sqlStatement;
 	}
 
-	public Try<SQLTemplate> execute(SQLCommand cmd) {
+	public Try<SQLTemplate, SQLTemplateException> execute(SQLCommand cmd) {
 		return cmd.apply(this);
 	}
 
-	public Try<SQLTemplate> autoCommit() {
+	public Try<SQLTemplate, SQLTemplateException> autoCommit() {
 		try {
 			conn.setAutoCommit(true);
 			conn.commit();
-			return Try.success(new SQLTemplate(conn, sqlStatement, sqlResult));
+			return success(new SQLTemplate(conn, sqlStatement, sqlResult));
 		} catch (Exception e) {
-			return Try.failure(e);
+			return failure(e);
 		}
 	}
 
-	public Try<SQLTemplate> noAutoCommit() {
+	public Try<SQLTemplate, SQLTemplateException> noAutoCommit() {
 		try {
 			conn.setAutoCommit(false);
 			conn.commit();
-			return Try.success(new SQLTemplate(conn, sqlStatement, sqlResult));
+			return success(new SQLTemplate(conn, sqlStatement, sqlResult));
 		} catch (Exception e) {
-			return Try.failure(e);
+			return failure(e);
 		}
 	}
 	
-	public Try<SQLTemplate> commit() {
+	public Try<SQLTemplate, SQLTemplateException> commit() {
 		try {
 			conn.commit();
-			return Try.success(new SQLTemplate(conn, sqlStatement, sqlResult));
+			return success(new SQLTemplate(conn, sqlStatement, sqlResult));
 		} catch (Exception e) {
-			return Try.failure(e);
+			return failure(e);
 		}
 	}
 	
-	public Try<SQLTemplate> rollback() {
+	public Try<SQLTemplate, SQLTemplateException> rollback() {
 		try {
 			conn.rollback();
-			return Try.success(new SQLTemplate(conn, sqlStatement, sqlResult));
+			return success(new SQLTemplate(conn, sqlStatement, sqlResult));
 		} catch (Exception e) {
-			return Try.failure(e);
+			return failure(e);
 		}
 	}
 
-	public Try<SQLTemplate> prepareStatement(String sql) {
+	public Try<SQLTemplate, SQLTemplateException> prepareStatement(String sql) {
 		try {
-			return Try.success(new SQLTemplate(conn, Optional.of(new SQLStatement(conn.prepareStatement(sql))), Optional.empty()));
+			return success(new SQLTemplate(conn, Optional.of(new SQLStatement(conn.prepareStatement(sql))), Optional.empty()));
 		} catch (Exception e) {
-			return Try.failure(e);
+			return failure(e);
 		}
 	}
 	
-	public Try<SQLTemplate> execute(Object[] params) {
+	public Try<SQLTemplate, SQLTemplateException> execute(Object[] params) {
 		return sqlStatement.map(st -> st.execute(params))
-				.map(res -> res.flatMap(cnt -> Try.success(new SQLTemplate(conn, sqlStatement, Optional.of(SQLResult.of(cnt))))))
-				.orElse(Try.success(new SQLTemplate(conn, sqlStatement, Optional.empty())));
+				.map(res -> res.flatMap(cnt -> success(new SQLTemplate(conn, sqlStatement, Optional.of(SQLResult.of(cnt))))))
+				.orElseGet(() -> success(new SQLTemplate(conn, sqlStatement, Optional.empty())));
 	}
 
-	public Try<SQLTemplate> executeQuery(Object[] params) {
+	public Try<SQLTemplate, SQLTemplateException> executeQuery(Object[] params) {
 		return sqlStatement.map(st -> st.executeQuery(params))
-				.map(res -> res.flatMap(set -> Try.success(new SQLTemplate(conn, sqlStatement, Optional.of(SQLResult.of(set))))))
-				.orElse(Try.success(new SQLTemplate(conn, sqlStatement, Optional.empty())));
+				.map(res -> res.flatMap(set -> success(new SQLTemplate(conn, sqlStatement, Optional.of(SQLResult.of(set))))))
+				.orElseGet(() -> success(new SQLTemplate(conn, sqlStatement, Optional.empty())));
 	}
 
-	public Try<SQLTemplate> execute() {
+	public Try<SQLTemplate, SQLTemplateException> execute() {
 		return execute((Object[])null);
 	}
 
-	public Try<SQLTemplate> executeQuery() {
+	public Try<SQLTemplate, SQLTemplateException> executeQuery() {
 		return executeQuery((Object[])null);
 	}
 
@@ -101,5 +102,17 @@ public class SQLTemplate {
 
 	public static SQLTemplate create(Connection conn) {
 		return new SQLTemplate(conn);
+	}
+
+	public static Function<Exception, SQLTemplateException> exception() {
+		return e -> (e instanceof SQLTemplateException) ? (SQLTemplateException)e : new SQLTemplateException("SQL template error", e);
+	}
+
+	public static <T> Try<T, SQLTemplateException> success(T template) {
+		return Try.success(SQLTemplate.exception(), template);
+	}
+
+	public static <T> Try<T, SQLTemplateException> failure(Exception exception) {
+		return Try.failure(SQLTemplate.exception(), SQLTemplate.exception().apply(exception));
 	}
 }
