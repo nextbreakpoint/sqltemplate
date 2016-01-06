@@ -1,3 +1,9 @@
+/*
+ * This file is part of SQLTemplate
+ * 
+ * Copyright (c) 2016, Andrea Medeghini
+ * All rights reserved.
+ */
 package com.nextbreakpoint.sql;
 
 public class SQLTemplateException extends Exception {
