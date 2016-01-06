@@ -1,5 +1,6 @@
 package com.nextbreakpoint.sql;
 
+import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
 
@@ -14,6 +15,7 @@ import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.ExpectedException;
 
+import com.nextbreakpoint.Try;
 import com.nextbreakpoint.sql.SQLCommand;
 import com.nextbreakpoint.sql.SQLTemplate;
 
@@ -48,7 +50,7 @@ public class SQLTemplateIT {
 	}
 
 	@Test
-	public void get_givenCommandIsNotEmpty_shouldReturnAValue() throws Exception {
+	public void get_givenCommandCreateATableAndInsertTwoRowsAndSelectAll_shouldReturnTwoRows() throws Exception {
 		SQLCommand cmd = SQLCommand.begin(sql -> sql.noAutoCommit()) 
 				.andThen(sql -> sql.prepareStatement("CREATE TABLE IF NOT EXISTS TEST(ID INT PRIMARY KEY, NAME VARCHAR(255) DEFAULT '')")) 
 				.andThen(sql -> sql.execute()) 
@@ -58,13 +60,15 @@ public class SQLTemplateIT {
 				.andThen(sql -> sql.execute(new Object[] { 1, "A" })) 
 				.andThen(sql -> sql.execute(new Object[] { 2, "B" })) 
 				.andThen(sql -> sql.commit()) 
-				.andThen(sql -> sql.execute(new Object[] { 3, "C" })) 
-				.andThen(sql -> sql.execute(new Object[] { 4, "D" })) 
-				.andThen(sql -> sql.rollback()) 
 				.andThen(sql -> sql.prepareStatement("SELECT * FROM TEST")) 
 				.andThen(sql -> sql.executeQuery()); 
 
-		assertTrue(SQLTemplate.create(conn).execute(cmd).isPresent());
-		assertNotNull(SQLTemplate.create(conn).execute(cmd).get());
+		Try<SQLTemplate, SQLTemplateException> sqlTemplate = SQLTemplate.create(conn).execute(cmd);
+		assertTrue(sqlTemplate.isPresent());
+
+		SQLTemplate result = sqlTemplate.get();
+		assertNotNull(result);
+		
+		assertEquals(2, result.stream().count());
 	}
 }

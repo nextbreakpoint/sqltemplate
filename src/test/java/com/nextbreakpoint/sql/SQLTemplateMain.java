@@ -36,7 +36,7 @@ public class SQLTemplateMain {
 				.andThen(sql -> sql.executeQuery()) 
 				.peek(sql -> sql.stream().map(columns -> columns[1]).forEach(System.out::println)); 
 			
-			SQLTemplate.create(conn).execute(cmd).ifPresentOrThrow(something -> { System.out.println("no errors"); });
+			SQLTemplate.create(conn).execute(cmd).ifPresentOrThrow(something -> { System.out.println("done"); });
 		} finally {
 		}
 	}
