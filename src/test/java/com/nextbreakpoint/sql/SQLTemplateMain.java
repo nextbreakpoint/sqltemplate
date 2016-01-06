@@ -9,9 +9,6 @@ package com.nextbreakpoint.sql;
 import java.sql.Connection;
 import java.sql.DriverManager;
 
-import com.nextbreakpoint.sql.SQLCommand;
-import com.nextbreakpoint.sql.SQLTemplate;
-
 public class SQLTemplateMain {
 	public static void main(String[] args) {
 		try {

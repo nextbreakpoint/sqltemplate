@@ -8,7 +8,7 @@ package com.nextbreakpoint.sql;
 
 import java.util.function.Consumer;
 
-import com.nextbreakpoint.util.Try;
+import com.nextbreakpoint.Try;
 
 @FunctionalInterface
 public interface SQLCommand {

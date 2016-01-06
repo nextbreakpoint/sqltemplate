@@ -10,7 +10,7 @@ import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.util.Objects;
 
-import com.nextbreakpoint.util.Try;
+import com.nextbreakpoint.Try;
 
 public class SQLStatement {
 	private final PreparedStatement st;
