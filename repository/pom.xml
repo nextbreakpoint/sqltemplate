@@ -44,7 +44,7 @@
 						</goals>
 						<configuration>
 							<groupId>com.nextbreakpoint</groupId>
-							<artifactId>Try</artifactId>
+							<artifactId>com.nextbreakpoint.try</artifactId>
 							<version>1.0</version>
 							<packaging>jar</packaging>
 							<file>target/com.nextbreakpoint.try-1.0.jar</file>
