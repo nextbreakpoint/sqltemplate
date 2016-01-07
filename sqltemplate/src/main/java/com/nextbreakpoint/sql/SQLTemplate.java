@@ -120,7 +120,7 @@ public class SQLTemplate {
 	}
 	
 	public static <T> Try<T, SQLTemplateException> tryWith(Block<T> block) {
-		return Try.of(wrapException(), block);
+		return Try.block(wrapException(), block);
 	}
 
 	private static Function<Exception, SQLTemplateException> wrapException() {

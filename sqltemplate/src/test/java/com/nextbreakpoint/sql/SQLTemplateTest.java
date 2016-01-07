@@ -149,7 +149,7 @@ public class SQLTemplateTest {
 		when(conn.prepareStatement(stmtSql)).thenReturn(stmt);
 		when(stmt.executeUpdate()).thenReturn(10);
 		Try<Stream<Object[]>, SQLTemplateException> tryStream = SQLTemplate.create(conn).execute(SQLCommand.begin(sql -> SQLTemplate.success(sql))).flatMap(sql -> SQLTemplate.success(sql.stream()));
-		assertTrue(tryStream.isSuccess());
+		assertFalse(tryStream.isFailure());
 		assertNotNull(tryStream.get());
 		assertEquals(0L, tryStream.get().count());
 	}
@@ -186,7 +186,7 @@ public class SQLTemplateTest {
 		when(conn.prepareStatement(stmtSql)).thenReturn(stmt);
 		when(stmt.executeUpdate()).thenReturn(10);
 		Try<Stream<Object[]>, SQLTemplateException> tryStream = SQLTemplate.create(conn).execute(SQLCommand.begin(sql -> sql.prepareStatement(stmtSql)).andThen(sql -> sql.execute())).flatMap(sql -> SQLTemplate.success(sql.stream()));
-		assertTrue(tryStream.isSuccess());
+		assertFalse(tryStream.isFailure());
 		assertNotNull(tryStream.get());
 		assertEquals(10L, tryStream.get().findFirst().get()[0]);
 	}
@@ -207,7 +207,7 @@ public class SQLTemplateTest {
 		when(rs.getObject(1)).thenReturn(1L);
 		when(rs.getObject(2)).thenReturn("a");
 		Try<Stream<Object[]>, SQLTemplateException> tryStream = SQLTemplate.create(conn).execute(SQLCommand.begin(sql -> sql.prepareStatement(stmtSql)).andThen(sql -> sql.executeQuery())).flatMap(sql -> SQLTemplate.success(sql.stream()));
-		assertTrue(tryStream.isSuccess());
+		assertFalse(tryStream.isFailure());
 		assertNotNull(tryStream.get());
 		Optional<Object[]> findFirst = tryStream.get().findFirst();
 		assertEquals(1L, findFirst.get()[0]);
@@ -232,7 +232,7 @@ public class SQLTemplateTest {
 		when(rs.getObject(1)).thenReturn(1L);
 		when(rs.getObject(2)).thenReturn("a");
 		Try<Stream<Object[]>, SQLTemplateException> tryStream = SQLTemplate.create(conn).execute(SQLCommand.begin(sql -> sql.prepareStatement(stmtSql)).andThen(sql -> sql.executeQuery()).peek(consumer)).flatMap(sql -> SQLTemplate.success(sql.stream()));
-		assertTrue(tryStream.isSuccess());
+		assertFalse(tryStream.isFailure());
 		assertNotNull(tryStream.get());
 		verify(consumer, times(1)).accept(any(SQLTemplate.class));
 	}
