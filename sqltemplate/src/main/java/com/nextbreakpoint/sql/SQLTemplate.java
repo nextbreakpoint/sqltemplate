@@ -13,6 +13,7 @@ import java.util.function.Function;
 import java.util.stream.Stream;
 
 import com.nextbreakpoint.Try;
+import com.nextbreakpoint.Try.Block;
 
 public class SQLTemplate {
 	private final Connection conn;
@@ -85,13 +86,13 @@ public class SQLTemplate {
 	public Try<SQLTemplate, SQLTemplateException> execute(Object[] params) {
 		return sqlStatement.map(st -> st.execute(params))
 				.map(res -> res.flatMap(cnt -> success(new SQLTemplate(conn, sqlStatement, Optional.of(SQLResult.of(cnt))))))
-				.orElseGet(() -> success(new SQLTemplate(conn, sqlStatement, Optional.empty())));
+				.orElseGet(() -> failure(new SQLTemplateException("statement not found")));
 	}
 
 	public Try<SQLTemplate, SQLTemplateException> executeQuery(Object[] params) {
 		return sqlStatement.map(st -> st.executeQuery(params))
 				.map(res -> res.flatMap(set -> success(new SQLTemplate(conn, sqlStatement, Optional.of(SQLResult.of(set))))))
-				.orElseGet(() -> success(new SQLTemplate(conn, sqlStatement, Optional.empty())));
+				.orElseGet(() -> failure(new SQLTemplateException("statement not found")));
 	}
 
 	public Try<SQLTemplate, SQLTemplateException> execute() {
@@ -116,6 +117,10 @@ public class SQLTemplate {
 
 	public static <T> Try<T, SQLTemplateException> failure(Exception exception) {
 		return Try.failure(wrapException(), wrapException().apply(exception));
+	}
+	
+	public static <T> Try<T, SQLTemplateException> tryWith(Block<T> block) {
+		return Try.of(wrapException(), block);
 	}
 
 	private static Function<Exception, SQLTemplateException> wrapException() {

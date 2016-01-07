@@ -29,8 +29,4 @@ public interface SQLCommand {
 	public static SQLCommand begin(SQLCommand cmd) {
 		return sql -> cmd.apply(sql);
 	}
-
-	public static SQLCommand create(SQLCommand cmd) {
-		return cmd;
-	}
 }
