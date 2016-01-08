@@ -21,7 +21,7 @@
 						<configuration>
 							<target>
 								<get dest="target">
-									<url url="https://github.com/nextbreakpoint/maven/raw/master/com.nextbreakpoint.try-1.0.jar" />
+									<url url="https://github.com/nextbreakpoint/try/releases/download/v1.0/com.nextbreakpoint.try-1.0.jar" />
 								</get>
 							</target>
 						</configuration>
