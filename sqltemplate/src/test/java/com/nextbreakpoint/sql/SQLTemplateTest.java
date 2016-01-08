@@ -240,7 +240,7 @@ public class SQLTemplateTest {
 	@Test
 	public void execute_givenCommandThrowsException_shouldReturnFailure() throws Exception {
 		Connection conn = mock(Connection.class);
-		Try<SQLTemplate, SQLTemplateException> trySQL = SQLTemplate.create(conn).execute(SQLCommand.begin(sql -> SQLTemplate.tryWith(() -> { throw new Exception(); })));
+		Try<SQLTemplate, SQLTemplateException> trySQL = SQLTemplate.create(conn).execute(SQLCommand.begin(sql -> SQLTemplate.of(() -> { throw new Exception(); })));
 		assertTrue(trySQL.isFailure());
 	}
 

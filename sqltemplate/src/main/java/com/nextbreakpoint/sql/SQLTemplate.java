@@ -13,7 +13,7 @@ import java.util.function.Function;
 import java.util.stream.Stream;
 
 import com.nextbreakpoint.Try;
-import com.nextbreakpoint.Try.Block;
+import com.nextbreakpoint.TrySupplier;
 
 public class SQLTemplate {
 	private final Connection conn;
@@ -26,8 +26,8 @@ public class SQLTemplate {
 
 	private SQLTemplate(Connection conn, Optional<SQLStatement> sqlStatement, Optional<SQLResult> sqlResult) {
 		Objects.requireNonNull(conn);
-		Objects.requireNonNull(sqlStatement);
 		Objects.requireNonNull(sqlResult);
+		Objects.requireNonNull(sqlStatement);
 		this.conn = conn;
 		this.sqlResult = sqlResult;
 		this.sqlStatement = sqlStatement;
@@ -119,8 +119,8 @@ public class SQLTemplate {
 		return Try.failure(wrapException(), wrapException().apply(exception));
 	}
 	
-	public static <T> Try<T, SQLTemplateException> tryWith(Block<T> block) {
-		return Try.block(wrapException(), block);
+	public static <T> Try<T, SQLTemplateException> of(TrySupplier<T> supplier) {
+		return Try.of(wrapException(), supplier);
 	}
 
 	private static Function<Exception, SQLTemplateException> wrapException() {
