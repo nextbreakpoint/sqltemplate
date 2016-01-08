@@ -123,7 +123,7 @@ public class SQLTemplate {
 		return Try.of(wrapException(), supplier);
 	}
 
-	private static Function<Exception, SQLTemplateException> wrapException() {
+	public static Function<Exception, SQLTemplateException> wrapException() {
 		return e -> (e instanceof SQLTemplateException) ? (SQLTemplateException)e : new SQLTemplateException("SQL template error", e);
 	}
 }

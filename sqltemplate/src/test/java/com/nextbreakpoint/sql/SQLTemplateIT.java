@@ -55,24 +55,26 @@ public class SQLTemplateIT {
 
 	@Test
 	public void get_givenCommandCreateATableAndInsertTwoRowsAndSelectAll_shouldReturnTwoRows() throws Exception {
-		SQLCommand cmd = SQLCommand.begin(sql -> sql.noAutoCommit()) 
-				.andThen(sql -> sql.prepareStatement("CREATE TABLE IF NOT EXISTS TEST(ID INT PRIMARY KEY, NAME VARCHAR(255) DEFAULT '')")) 
-				.andThen(sql -> sql.execute()) 
-				.andThen(sql -> sql.prepareStatement("DELETE TEST")) 
-				.andThen(sql -> sql.execute()) 
-				.andThen(sql -> sql.prepareStatement("INSERT INTO TEST (ID, NAME) VALUES (?, ?)")) 
-				.andThen(sql -> sql.execute(new Object[] { 1, "A" })) 
-				.andThen(sql -> sql.execute(new Object[] { 2, "B" })) 
-				.andThen(sql -> sql.commit()) 
-				.andThen(sql -> sql.prepareStatement("SELECT * FROM TEST")) 
-				.andThen(sql -> sql.executeQuery()); 
+		SQLCommand cmd = SQLCommand.begin()
+				.noAutoCommit() 
+				.prepareStatement("CREATE TABLE IF NOT EXISTS TEST(ID INT PRIMARY KEY, NAME VARCHAR(255) DEFAULT '')")
+				.execute() 
+				.prepareStatement("DELETE TEST")
+				.execute() 
+				.prepareStatement("INSERT INTO TEST (ID, NAME) VALUES (?, ?)")
+				.execute(new Object[] { 1, "A" })
+				.execute(new Object[] { 2, "B" })
+				.commit() 
+				.prepareStatement("SELECT * FROM TEST")
+				.executeQuery(); 
 
 		Try<SQLTemplate, SQLTemplateException> sqlTemplate = SQLTemplate.create(conn).execute(cmd);
+		
 		assertTrue(sqlTemplate.isPresent());
 
 		SQLTemplate result = sqlTemplate.get();
-		assertNotNull(result);
 		
+		assertNotNull(result);
 		assertEquals(2, result.stream().count());
 	}
 }
