@@ -17,7 +17,7 @@
 				<executions>
 					<execution>
 						<id>github-download-jar</id>
-						<phase>validate</phase>
+						<phase>clean</phase>
 						<configuration>
 							<target>
 								<get dest="target">
@@ -38,7 +38,7 @@
 				<executions>
 					<execution>
 						<id>github-install-file</id>
-						<phase>validate</phase>
+						<phase>clean</phase>
 						<goals>
 							<goal>install-file</goal>
 						</goals>
