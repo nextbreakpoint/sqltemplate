@@ -1,6 +1,6 @@
 # SQLTemplate
 
-SQLTemplate is a functional API to execute SQL statements in Java language.
+SQLTemplate implements a functional API to execute SQL statements in Java language.
 
 SQLTemplate requires Java 8 and a JDBC driver for target database.
 
