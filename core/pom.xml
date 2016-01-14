@@ -3,10 +3,10 @@
 	<modelVersion>4.0.0</modelVersion>
 	<parent>
 		<groupId>com.nextbreakpoint</groupId>
-		<artifactId>com.nextbreakpoint.sql</artifactId>
+		<artifactId>com.nextbreakpoint.sqltemplate</artifactId>
 		<version>1.0</version>
 	</parent>
-	<artifactId>com.nextbreakpoint.sql.sqltemplate</artifactId>
+	<artifactId>com.nextbreakpoint.sqltemplate.core</artifactId>
 	<packaging>jar</packaging>
 	<properties>
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>

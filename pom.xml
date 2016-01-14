@@ -2,7 +2,7 @@
 	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
 	<modelVersion>4.0.0</modelVersion>
 	<groupId>com.nextbreakpoint</groupId>
-	<artifactId>com.nextbreakpoint.sql</artifactId>
+	<artifactId>com.nextbreakpoint.sqltemplate</artifactId>
 	<version>1.0</version>
 	<packaging>pom</packaging>
 	<properties>
@@ -10,6 +10,6 @@
 	</properties>
 	<modules>
 		<module>repository</module>
-		<module>sqltemplate</module>
+		<module>core</module>
 	</modules>
 </project>
