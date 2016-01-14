@@ -9,11 +9,11 @@ package com.nextbreakpoint.sql;
 import java.sql.Connection;
 import java.util.Objects;
 import java.util.Optional;
+import java.util.concurrent.Callable;
 import java.util.function.Function;
 import java.util.stream.Stream;
 
 import com.nextbreakpoint.Try;
-import com.nextbreakpoint.TrySupplier;
 
 public class SQLTemplate {
 	private final Connection conn;
@@ -119,11 +119,11 @@ public class SQLTemplate {
 		return Try.failure(wrapException(), wrapException().apply(exception));
 	}
 	
-	public static <T> Try<T, SQLTemplateException> of(TrySupplier<T> supplier) {
-		return Try.of(wrapException(), supplier);
+	public static <T> Try<T, SQLTemplateException> of(Callable<T> callable) {
+		return Try.of(wrapException(), callable);
 	}
 
-	public static Function<Exception, SQLTemplateException> wrapException() {
+	public static Function<Throwable, SQLTemplateException> wrapException() {
 		return e -> (e instanceof SQLTemplateException) ? (SQLTemplateException)e : new SQLTemplateException("SQL template error", e);
 	}
 }
