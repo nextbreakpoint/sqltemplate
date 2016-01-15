@@ -21,10 +21,6 @@ public abstract class SQLResult {
 		return new SQLResultQuery(rs);
 	}
 	
-	public static SQLResult of(Long result) {
-		return new SQLResultUpdate(result);
-	}
-	
 	public static SQLResult of(Integer result) {
 		return new SQLResultUpdate(result);
 	}
