@@ -14,13 +14,33 @@ import java.util.function.Consumer;
 import java.util.stream.Stream;
 import java.util.stream.StreamSupport;
 
+/**
+ * Encapsulates the result of executing a statement. 
+ * 
+ * @author Andrea
+ *
+ */
 public abstract class SQLResult {
+	/**
+	 * Creates stream from result values.  
+	 * @return the stream
+	 */
 	public abstract Stream<Object[]> stream();
 
+	/**
+	 * Creates a new instance from given result set.
+	 * @param rs the result set
+	 * @return new instance
+	 */
 	public static SQLResult of(ResultSet rs) {
 		return new SQLResultQuery(rs);
 	}
 	
+	/**
+	 * Creates a new instance from given integer value.
+	 * @param result the integer value
+	 * @return new instance
+	 */
 	public static SQLResult of(Integer result) {
 		return new SQLResultUpdate(result);
 	}

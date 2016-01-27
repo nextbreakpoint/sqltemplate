@@ -12,9 +12,19 @@ import java.util.Objects;
 
 import com.nextbreakpoint.Try;
 
+/**
+ * Encapsulates a prepared statement.
+ * 
+ * @author Andrea
+ *
+ */
 public class SQLStatement {
 	private final PreparedStatement st;
 
+	/**
+	 * Creates new instance from given prepared statement.
+	 * @param st the prepared statement
+	 */
 	public SQLStatement(PreparedStatement st) {
 		Objects.requireNonNull(st);
 		this.st = st;
@@ -27,6 +37,11 @@ public class SQLStatement {
 		}
 	}
 
+	/**
+	 * Executes statement with given parameters and returns the result as Try instance.
+	 * @param params the parameters
+	 * @return the result
+	 */
 	public Try<Integer, SQLTemplateException> execute(Object[] params) {
 		try {
 			bindParameters(params);
@@ -36,6 +51,11 @@ public class SQLStatement {
 		}
 	}
 
+	/**
+	 * Executes query statement with given parameters and returns the result as Try instance.
+	 * @param params the parameters
+	 * @return the result
+	 */
 	public Try<ResultSet, SQLTemplateException> executeQuery(Object[] params) {
 		try {
 			bindParameters(params);
