@@ -1,4 +1,4 @@
-# SQLTemplate 1.1
+# SQLTemplate 1.2
 
 SQLTemplate implements a functional API for executing SQL statements using JDBC in Java 8
 
