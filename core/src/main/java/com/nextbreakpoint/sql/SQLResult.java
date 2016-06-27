@@ -22,7 +22,7 @@ import java.util.stream.StreamSupport;
  */
 public abstract class SQLResult {
 	/**
-	 * Creates stream from result values.  
+	 * Creates stream from result get.
 	 * @return the stream
 	 */
 	public abstract Stream<Object[]> stream();

@@ -37,9 +37,9 @@ public class SQLTemplateMain {
 				.rollback()
 				.prepareStatement("SELECT * FROM TEST")
 				.executeQuery()
-				.peek(sql -> sql.stream().map(columns -> columns[1]).forEach(System.out::println)); 
+				/*.peek(sql -> sql.stream().map(columns -> columns[1]).forEach(System.out::println))*/;
 			
-			SQLTemplate.create(conn).execute(cmd).ifPresentOrThrow(sql -> { System.out.println("done"); });
+			SQLTemplate.of(conn).execute(cmd).ifPresentOrThrow(sql -> { System.out.println("done"); });
 		} finally {
 		}
 	}

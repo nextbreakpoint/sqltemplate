@@ -13,7 +13,6 @@ import static org.junit.Assert.assertTrue;
 import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.SQLException;
-import java.util.stream.Collectors;
 
 import org.junit.After;
 import org.junit.Before;
@@ -42,6 +41,7 @@ public class SQLTemplateIT {
 	@Before
 	public void setupConnection() throws Exception {
 		conn = DriverManager.getConnection("jdbc:h2:~/test", "sa", "");
+		conn.prepareStatement("DELETE TEST").executeUpdate();
 	}
 
 	@After
@@ -57,46 +57,37 @@ public class SQLTemplateIT {
 	@Test
 	public void execute_givenCommandCreateATableAndInsertTwoRowsAndSelectAll_shouldReturnSuccess() throws Exception {
 		SQLCommand cmd = newTestCommand(); 
-		Try<SQLTemplate, SQLTemplateException> sqlTemplate = SQLTemplate.create(conn).execute(cmd);
+		Try<SQLTemplate, SQLTemplateException> sqlTemplate = SQLTemplate.of(conn).execute(cmd);
 		assertTrue(sqlTemplate.isPresent());
 	}
 
 	@Test
 	public void get_givenCommandCreateATableAndInsertTwoRowsAndSelectAll_shouldReturnStream() throws Exception {
 		SQLCommand cmd = newTestCommand(); 
-		Try<SQLTemplate, SQLTemplateException> sqlTemplate = SQLTemplate.create(conn).execute(cmd);
+		Try<SQLTemplate, SQLTemplateException> sqlTemplate = SQLTemplate.of(conn).execute(cmd);
 		SQLTemplate result = sqlTemplate.get();
-		assertNotNull(result.stream());
+		assertNotNull(result.get());
 	}
 
 	@Test
 	public void get_givenCommandCreateATableAndInsertTwoRowsAndSelectAll_shouldReturnTwoRows() throws Exception {
 		SQLCommand cmd = newTestCommand(); 
-		Try<SQLTemplate, SQLTemplateException> sqlTemplate = SQLTemplate.create(conn).execute(cmd);
+		Try<SQLTemplate, SQLTemplateException> sqlTemplate = SQLTemplate.of(conn).execute(cmd);
 		SQLTemplate result = sqlTemplate.get();
-		assertEquals(2, result.stream().count());
-	}
-
-	@Test
-	public void get_givenCommandCreateATableAndInsertTwoRowsAndSelectAll_shouldNotReturnAnyValue_whenStreamIsConsumed() throws Exception {
-		SQLCommand cmd = newTestCommand(); 
-		Try<SQLTemplate, SQLTemplateException> sqlTemplate = SQLTemplate.create(conn).execute(cmd);
-		SQLTemplate result = sqlTemplate.get();
-		result.stream().collect(Collectors.toList());
-		assertEquals(0, result.stream().count());
+		assertEquals(2, result.get().size());
 	}
 
 	@Test
 	public void execute_givenCommandContainsErrorInStatement_shouldReturnFailure() throws Exception {
 		SQLCommand cmd = newTestCommandWithErrorInStatement(); 
-		Try<SQLTemplate, SQLTemplateException> sqlTemplate = SQLTemplate.create(conn).execute(cmd);
+		Try<SQLTemplate, SQLTemplateException> sqlTemplate = SQLTemplate.of(conn).execute(cmd);
 		assertTrue(sqlTemplate.isFailure());
 	}
 
 	@Test
 	public void execute_givenCommandContainsErrorInParameters_shouldReturnFailure() throws Exception {
 		SQLCommand cmd = newTestCommandWithErrorInParameters(); 
-		Try<SQLTemplate, SQLTemplateException> sqlTemplate = SQLTemplate.create(conn).execute(cmd);
+		Try<SQLTemplate, SQLTemplateException> sqlTemplate = SQLTemplate.of(conn).execute(cmd);
 		assertTrue(sqlTemplate.isFailure());
 	}
 

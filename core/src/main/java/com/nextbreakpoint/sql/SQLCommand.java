@@ -7,6 +7,7 @@
 package com.nextbreakpoint.sql;
 
 import java.util.function.Consumer;
+import java.util.stream.Stream;
 
 import com.nextbreakpoint.Try;
 
@@ -23,14 +24,14 @@ public interface SQLCommand {
 	 * @param sql the SQLTemplate
 	 * @return the result
 	 */
-	public Try<SQLTemplate, SQLTemplateException> apply(SQLTemplate sql);
+	public Try<SQLDriver, SQLTemplateException> apply(SQLDriver sql);
 
 	/**
 	 * Creates a new empty command.
 	 * @return new command
 	 */
 	public static SQLCommand begin() {
-		return sql -> Try.success(SQLTemplate.defaultMapper(), sql);
+		return sql -> Try.success(SQLDriver.defaultMapper(), sql);
 	}
 
 	/**
@@ -134,17 +135,12 @@ public interface SQLCommand {
 	public default SQLCommand executeQuery() {
 		return this.andThen(sql -> sql.executeQuery());
 	}
-
-	/**
-	 * Applies the command and consumes the result if present. 
-	 * @param consumer the consumer
-	 * @return the result
-	 */
-	public default SQLCommand peek(Consumer<SQLTemplate> consumer) {
-		return sql -> {
-			Try<SQLTemplate, SQLTemplateException> result = apply(sql);
-			result.ifPresent(consumer);
-			return result; 
-		};
-	}
+//
+//	/**
+//	 * Applies the command and consumes the result if present.
+//	 * @return the result
+//	 */
+//	public default Try<Stream<Object[]>, SQLTemplateException> stream() {
+//		return this.andThen(sql -> this.apply(sql).map(d -> d.stream()));
+//	}
 }

@@ -45,9 +45,9 @@ public class SQLStatement {
 	public Try<Integer, SQLTemplateException> execute(Object[] params) {
 		try {
 			bindParameters(params);
-			return SQLTemplate.success(st.executeUpdate());
+			return SQLDriver.success(st.executeUpdate());
 		} catch (Exception e) {
-			return SQLTemplate.failure(e);
+			return SQLDriver.failure(e);
 		}
 	}
 
@@ -59,9 +59,9 @@ public class SQLStatement {
 	public Try<ResultSet, SQLTemplateException> executeQuery(Object[] params) {
 		try {
 			bindParameters(params);
-			return SQLTemplate.success(st.executeQuery());
+			return SQLDriver.success(st.executeQuery());
 		} catch (Exception e) {
-			return SQLTemplate.failure(e);
+			return SQLDriver.failure(e);
 		}
 	}
 
