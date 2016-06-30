@@ -6,10 +6,6 @@
  */
 package com.nextbreakpoint.sql;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertTrue;
-
 import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.SQLException;
@@ -23,6 +19,8 @@ import org.junit.Test;
 import org.junit.rules.ExpectedException;
 
 import com.nextbreakpoint.Try;
+
+import static org.junit.Assert.*;
 
 public class SQLTemplateIT {
 	@Rule
@@ -56,82 +54,85 @@ public class SQLTemplateIT {
 	}
 
 	@Test
-	public void execute_givenCommandCreateATableAndInsertTwoRowsAndSelectAll_shouldReturnSuccess() throws Exception {
-		SQLCommand cmd = newTestCommand(); 
-		Try<List<Object[]>, SQLTemplateException> sqlTemplate = SQLTemplate.with(conn).execute(cmd);
-		assertTrue(sqlTemplate.isPresent());
+	public void shouldReturnSuccess() throws Exception {
+		SQLTemplate template = templateWithValidStatement();
+		Try<List<Object[]>, SQLTemplateException> result = template.run();
+		assertFalse(result.isFailure());
 	}
 
 	@Test
-	public void get_givenCommandCreateATableAndInsertTwoRowsAndSelectAll_shouldReturnStream() throws Exception {
-		SQLCommand cmd = newTestCommand(); 
-		Try<List<Object[]>, SQLTemplateException> sqlTemplate = SQLTemplate.with(conn).execute(cmd);
-		assertNotNull(sqlTemplate.get());
+	public void shouldReturnResult() throws Exception {
+		SQLTemplate template = templateWithValidStatement();
+		Try<List<Object[]>, SQLTemplateException> result = template.run();
+		assertNotNull(result.get());
 	}
 
 	@Test
-	public void get_givenCommandCreateATableAndInsertTwoRowsAndSelectAll_shouldReturnTwoRows() throws Exception {
-		SQLCommand cmd = newTestCommand(); 
-		Try<List<Object[]>, SQLTemplateException> sqlTemplate = SQLTemplate.with(conn).execute(cmd);
-		assertEquals(2, sqlTemplate.get().size());
+	public void shouldReturnTwoRows() throws Exception {
+		SQLTemplate template = templateWithValidStatement();
+		Try<List<Object[]>, SQLTemplateException> result = template.run();
+		assertEquals(2, result.get().size());
 	}
 
 	@Test
-	public void execute_givenCommandContainsErrorInStatement_shouldReturnFailure() throws Exception {
-		SQLCommand cmd = newTestCommandWithErrorInStatement(); 
-		Try<List<Object[]>, SQLTemplateException> sqlTemplate = SQLTemplate.with(conn).execute(cmd);
-		assertTrue(sqlTemplate.isFailure());
+	public void shouldReturnFailureWhenErrorInStatement() throws Exception {
+		SQLTemplate template = templateWithErrorInStatement();
+		Try<List<Object[]>, SQLTemplateException> result = template.run();
+		assertTrue(result.isFailure());
 	}
 
 	@Test
-	public void execute_givenCommandContainsErrorInParameters_shouldReturnFailure() throws Exception {
-		SQLCommand cmd = newTestCommandWithErrorInParameters(); 
-		Try<List<Object[]>, SQLTemplateException> sqlTemplate = SQLTemplate.with(conn).execute(cmd);
-		assertTrue(sqlTemplate.isFailure());
+	public void shouldReturnFailureWhenErrorInParameters() throws Exception {
+		SQLTemplate template = templateWithErrorInParameters();
+		Try<List<Object[]>, SQLTemplateException> result = template.run();
+		assertTrue(result.isFailure());
 	}
 
-	private SQLCommand newTestCommand() {
-		return SQLCommand.begin()
+	private SQLTemplate templateWithValidStatement() {
+		return SQLTemplate.builder(conn)
 			.noAutoCommit() 
 			.prepareStatement("CREATE TABLE IF NOT EXISTS TEST(ID INT PRIMARY KEY, NAME VARCHAR(255) DEFAULT '')")
-			.execute() 
+			.executeUpdate()
 			.prepareStatement("DELETE TEST")
-			.execute() 
+			.executeUpdate()
 			.prepareStatement("INSERT INTO TEST (ID, NAME) VALUES (?, ?)")
-			.execute(new Object[] { 1, "A" })
-			.execute(new Object[] { 2, "B" })
+			.executeUpdate(new Object[] { 1, "A" })
+			.executeUpdate(new Object[] { 2, "B" })
 			.commit() 
 			.prepareStatement("SELECT * FROM TEST")
-			.executeQuery();
+			.executeQuery()
+			.build();
 	}
  
-	private SQLCommand newTestCommandWithErrorInStatement() {
-		return SQLCommand.begin()
+	private SQLTemplate templateWithErrorInStatement() {
+		return SQLTemplate.builder(conn)
 			.noAutoCommit() 
 			.prepareStatement("CREAT TABLE IF NOT EXISTS TEST(ID INT PRIMARY KEY, NAME VARCHAR(255) DEFAULT '')")
-			.execute() 
+			.executeUpdate()
 			.prepareStatement("DELETE TEST")
-			.execute() 
+			.executeUpdate()
 			.prepareStatement("INSERT INTO TEST (ID, NAME) VALUES (?, ?)")
-			.execute(new Object[] { 1, "A" })
-			.execute(new Object[] { 2, "B" })
+			.executeUpdate(new Object[] { 1, "A" })
+			.executeUpdate(new Object[] { 2, "B" })
 			.commit() 
 			.prepareStatement("SELECT * FROM TEST")
-			.executeQuery();
+			.executeQuery()
+			.build();
 	}
 
-	private SQLCommand newTestCommandWithErrorInParameters() {
-		return SQLCommand.begin()
+	private SQLTemplate templateWithErrorInParameters() {
+		return SQLTemplate.builder(conn)
 			.noAutoCommit() 
 			.prepareStatement("CREATE TABLE IF NOT EXISTS TEST(ID INT PRIMARY KEY, NAME VARCHAR(255) DEFAULT '')")
-			.execute() 
+			.executeUpdate()
 			.prepareStatement("DELETE TEST")
-			.execute() 
+			.executeUpdate()
 			.prepareStatement("INSERT INTO TEST (ID, NAME) VALUES (?, ?)")
-			.execute(new Object[] { 1, "A" })
-			.execute(new Object[] { "A", "B" })
+			.executeUpdate(new Object[] { 1, "A" })
+			.executeUpdate(new Object[] { "A", "B" })
 			.commit() 
 			.prepareStatement("SELECT * FROM TEST")
-			.executeQuery();
+			.executeQuery()
+			.build();
 	}
 }

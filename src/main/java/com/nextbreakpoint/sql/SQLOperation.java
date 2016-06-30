@@ -15,20 +15,20 @@ import com.nextbreakpoint.Try;
  *
  */
 @FunctionalInterface
-interface SQLFunction {
+interface SQLOperation {
 	/**
 	 * Invokes operations on given SQLDriver and returns the result as Try instance.
-	 * @param sql the SQLDriver
+	 * @param driver the SQLDriver
 	 * @return the result
 	 */
-	public Try<SQLDriver, SQLTemplateException> apply(SQLDriver sql);
+	public Try<SQLDriver, SQLTemplateException> apply(SQLDriver driver);
 
 	/**
-	 * Concatenates a function with another function.
-	 * @param other the function
-	 * @return the new function
+	 * Appends another operation.
+	 * @param other an operation
+	 * @return new operation
 	 */
-	public default SQLFunction andThen(SQLFunction other) {
-		return driver -> this.apply(driver).flatMap(driver2 -> other.apply(driver2));
+	public default SQLOperation andThen(SQLOperation other) {
+		return driver -> this.apply(driver).flatMap(otherDriver -> other.apply(otherDriver));
 	}
 }

@@ -20,33 +20,33 @@ public class SQLDriverTest {
 	public ExpectedException exception = ExpectedException.none();
 	
 	@Test
-	public void create_givenConnectionIsNull_shouldThrowException() {
+	public void shouldThrowException() {
 		exception.expect(NullPointerException.class);
 		SQLDriver.create(null);
 	}
 
 	@Test
-	public void create_givenConnectionIsNotNull_shouldReturnSQL() {
+	public void shouldNotReturnNull() {
 		Connection conn = mock(Connection.class);
 		assertNotNull(SQLDriver.create(conn));
 	}
 
 	@Test
-	public void execute_givenCommandIsNoAutoCommit_shouldSetAutoCommitToFalse() throws Exception {
+	public void shouldCallSetAutoCommitWithFalse() throws Exception {
 		Connection conn = mock(Connection.class);
 		SQLDriver.create(conn).noAutoCommit();
 		verify(conn, times(1)).setAutoCommit(false);
 	}
 
 	@Test
-	public void execute_givenCommandIsAutoCommit_shouldSetAutoCommitToTrue() throws Exception {
+	public void shouldCallSetAutoCommitWithTrue() throws Exception {
 		Connection conn = mock(Connection.class);
 		SQLDriver.create(conn).autoCommit();
 		verify(conn, times(1)).setAutoCommit(true);
 	}
 
 	@Test
-	public void execute_givenCommandIsPrepareStatement_shouldCallPrepareStatement() throws Exception {
+	public void shouldCallPrepareStatement() throws Exception {
 		Connection conn = mock(Connection.class);
 		String stmtSql = "select * from test";
 		SQLDriver.create(conn).prepareStatement(stmtSql);
@@ -54,17 +54,17 @@ public class SQLDriverTest {
 	}
 
 	@Test
-	public void execute_givenCommandIsPrepareStatementAndThenExecute_shouldCallExecuteUpdate() throws Exception {
+	public void shouldCallExecuteUpdate() throws Exception {
 		Connection conn = mock(Connection.class);
 		PreparedStatement stmt = mock(PreparedStatement.class);
 		String stmtSql = "delete from test";
 		when(conn.prepareStatement(stmtSql)).thenReturn(stmt);
-		SQLDriver.create(conn).prepareStatement(stmtSql).get().execute();
+		SQLDriver.create(conn).prepareStatement(stmtSql).get().executeUpdate();
 		verify(stmt, times(1)).executeUpdate();
 	}
 
 	@Test
-	public void execute_givenCommandIsPrepareStatementAndThenExecuteQuery_shouldCallExecuteUpdate() throws Exception {
+	public void shouldCallExecuteQuery() throws Exception {
 		Connection conn = mock(Connection.class);
 		PreparedStatement stmt = mock(PreparedStatement.class);
 		String stmtSql = "select * from test";
@@ -74,18 +74,18 @@ public class SQLDriverTest {
 	}
 
 	@Test
-	public void execute_givenCommandIsPrepareStatementAndThenExecute_shouldCallExecuteUpdateWithArguments() throws Exception {
+	public void shouldCallExecuteUpdateWithArguments() throws Exception {
 		Connection conn = mock(Connection.class);
 		PreparedStatement stmt = mock(PreparedStatement.class);
 		String stmtSql = "delete from test";
 		when(conn.prepareStatement(stmtSql)).thenReturn(stmt);
-		SQLDriver.create(conn).prepareStatement(stmtSql).get().execute(new Object[] { 1L });
+		SQLDriver.create(conn).prepareStatement(stmtSql).get().executeUpdate(new Object[] { 1L });
 		verify(stmt, times(1)).setObject(1, 1L);
 		verify(stmt, times(1)).executeUpdate();
 	}
 
 	@Test
-	public void execute_givenCommandIsPrepareStatementAndThenExecuteQuery_shouldCallExecuteUpdateWithArguments() throws Exception {
+	public void shouldCallExecuteQueryWithArguments() throws Exception {
 		Connection conn = mock(Connection.class);
 		PreparedStatement stmt = mock(PreparedStatement.class);
 		String stmtSql = "select * from test";
@@ -96,24 +96,24 @@ public class SQLDriverTest {
 	}
 
 	@Test
-	public void execute_givenCommandIsPrepareStatementAndThenExecuteAndThenCommit_shouldCallCommit() throws Exception {
+	public void shouldCallCommit() throws Exception {
 		Connection conn = mock(Connection.class);
 		PreparedStatement stmt = mock(PreparedStatement.class);
 		String stmtSql = "select * from test";
 		when(conn.prepareStatement(stmtSql)).thenReturn(stmt);
 		when(stmt.executeUpdate()).thenReturn(1);
-		SQLDriver.create(conn).prepareStatement(stmtSql).get().execute().get().commit();
+		SQLDriver.create(conn).prepareStatement(stmtSql).get().executeUpdate().get().commit();
 		verify(conn, times(1)).commit();
 	}
 
 	@Test
-	public void execute_givenCommandIsPrepareStatementAndThenExecuteAndThenRollback_shouldCallRollback() throws Exception {
+	public void shouldCallRollback() throws Exception {
 		Connection conn = mock(Connection.class);
 		PreparedStatement stmt = mock(PreparedStatement.class);
 		String stmtSql = "select * from test";
 		when(conn.prepareStatement(stmtSql)).thenReturn(stmt);
 		when(stmt.executeUpdate()).thenReturn(1);
-		SQLDriver.create(conn).prepareStatement(stmtSql).get().execute().get().rollback();
+		SQLDriver.create(conn).prepareStatement(stmtSql).get().executeUpdate().get().rollback();
 		verify(conn, times(1)).rollback();
 	}
 }

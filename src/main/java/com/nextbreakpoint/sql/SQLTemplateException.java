@@ -9,7 +9,7 @@ package com.nextbreakpoint.sql;
 import java.util.Objects;
 
 /**
- * Exception thrown to report errors.
+ * Exception which encapsulates SQL errors.
  * 
  * @author Andrea
  *

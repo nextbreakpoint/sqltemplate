@@ -19,28 +19,30 @@ import java.util.List;
  *
  */
 public class SQLTemplate {
-	private final Connection conn;
+	private final SQLOperation operation;
+	private final Connection connection;
 
-	private SQLTemplate(Connection conn) {
-		Objects.requireNonNull(conn);
-		this.conn = conn;
+	SQLTemplate(Connection connection, SQLOperation operation) {
+		Objects.requireNonNull(operation);
+		Objects.requireNonNull(connection);
+		this.connection = connection;
+		this.operation = operation;
 	}
 
 	/**
-	 * Attempts to execute the given command and returns the result as Try instance.
-	 * @param command the command
+	 * Attempts to executeUpdate the operations and returns the result as Try instance.
 	 * @return the result
 	 */
-	public Try<List<Object[]>, SQLTemplateException> execute(SQLCommand command) {
-		return command.apply(SQLDriver.create(conn)).map(driver -> driver.values());
+	public Try<List<Object[]>, SQLTemplateException> run() {
+		return operation.apply(SQLDriver.create(connection)).map(driver -> driver.values());
 	}
 
 	/**
-	 * Creates a new instance from given connection.
-	 * @param conn the connection
-	 * @return the new instance
+	 * Creates a builder with given connection.
+	 * @param connection the connection
+	 * @return the builder
 	 */
-	public static SQLTemplate with(Connection conn) {
-		return new SQLTemplate(conn);
+	public static SQLBuilder builder(Connection connection) {
+		return SQLBuilder.with(connection);
 	}
 }

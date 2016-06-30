@@ -15,7 +15,7 @@ import java.util.stream.Stream;
 import java.util.stream.StreamSupport;
 
 /**
- * Encapsulates the result with executing a statement.
+ * Encapsulates a JDBC ResultSet.
  * 
  * @author Andrea
  *

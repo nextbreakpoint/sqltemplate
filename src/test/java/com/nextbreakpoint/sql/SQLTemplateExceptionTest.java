@@ -9,36 +9,36 @@ public class SQLTemplateExceptionTest {
 	public ExpectedException exception = ExpectedException.none();
 
 	@Test
-	public void constructor_givenNullMessage_shouldThrowException() {
+	public void shouldThrowExceptionWhenMessageIsNull() {
 		exception.expect(NullPointerException.class);
 		new SQLTemplateException(null);
 	}
 
 	@Test
-	public void constructor_givenNotNullMessage_shouldNotThrowException() {
+	public void shouldNotThrowExceptionWhenMessageIsNotNull() {
 		new SQLTemplateException("TEST");
 	}
 	
 	@Test
-	public void constructor_givenNullMessageAndNullCause_shouldThrowException() {
-		exception.expect(NullPointerException.class);
-		new SQLTemplateException(null, null);
-	}
-	
-	@Test
-	public void constructor_givenNotNullMessageAndNullCause_shouldThrowException() {
+	public void shouldThrowExceptionWhenOnlyCauseIsNull() {
 		exception.expect(NullPointerException.class);
 		new SQLTemplateException("TEST", null);
 	}
 
 	@Test
-	public void constructor_givenNullMessageAndNotNullCause_shouldThrowException() {
+	public void shouldThrowExceptionWhenOnlyMessageIsNull() {
 		exception.expect(NullPointerException.class);
 		new SQLTemplateException(null, new Exception());
 	}
 
 	@Test
-	public void constructor_givenNotNullMessageAndNullCause_shouldNotThrowException() {
+	public void shouldThrowExceptionWhenMessageAndCauseAreNull() {
+		exception.expect(NullPointerException.class);
+		new SQLTemplateException(null, null);
+	}
+
+	@Test
+	public void shouldNotThrowExceptionWhenMessageAndCauseAreNotNull() {
 		new SQLTemplateException("TEST", new Exception());
 	}
 }

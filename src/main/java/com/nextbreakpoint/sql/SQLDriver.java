@@ -10,7 +10,6 @@ import com.nextbreakpoint.Try;
 import java.util.List;
 
 import java.sql.Connection;
-import java.util.Collections;
 import java.util.Objects;
 import java.util.Optional;
 import java.util.concurrent.Callable;
@@ -19,7 +18,7 @@ import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 /**
- * SQLTemplate implements a functional API for executing SQL statements using JDBC in Java 8.
+ * Provides an interface for executing JDBC operations.
  * 
  * @author Andrea
  *
@@ -110,18 +109,18 @@ class SQLDriver {
 	}
 
 	/**
-	 * Attempts to execute the current statement with given parameters and returns the result as Try instance.
+	 * Attempts to executeUpdate the current statement with given parameters and returns the result as Try instance.
 	 * @param params the parameters
 	 * @return the result
 	 */
-	public Try<SQLDriver, SQLTemplateException> execute(Object[] params) {
+	public Try<SQLDriver, SQLTemplateException> executeUpdate(Object[] params) {
 		return sqlStatement.map(st -> st.execute(params))
 				.map(res -> res.flatMap(cnt -> success(new SQLDriver(conn, sqlStatement, Optional.of(SQLResult.of(cnt))))))
 				.orElseGet(() -> failure(new SQLTemplateException("statement not found")));
 	}
 
 	/**
-	 * Attempts to execute the current query statement with given parameters and returns the result as Try instance.
+	 * Attempts to executeUpdate the current query statement with given parameters and returns the result as Try instance.
 	 * @param params the parameters
 	 * @return the result
 	 */
@@ -132,15 +131,15 @@ class SQLDriver {
 	}
 
 	/**
-	 * Attempts to execute the current statement and returns the result as Try instance.
+	 * Attempts to executeUpdate the current statement and returns the result as Try instance.
 	 * @return the result
 	 */
-	public Try<SQLDriver, SQLTemplateException> execute() {
-		return execute((Object[])null);
+	public Try<SQLDriver, SQLTemplateException> executeUpdate() {
+		return executeUpdate((Object[])null);
 	}
 
 	/**
-	 * Attempts to execute the current query statement and returns the result as Try instance.
+	 * Attempts to executeUpdate the current query statement and returns the result as Try instance.
 	 * @return the result
 	 */
 	public Try<SQLDriver, SQLTemplateException> executeQuery() {

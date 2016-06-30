@@ -13,7 +13,7 @@ import java.util.Objects;
 import com.nextbreakpoint.Try;
 
 /**
- * Encapsulates a prepared statement.
+ * Encapsulates a JDBC PreparedStatement.
  * 
  * @author Andrea
  *

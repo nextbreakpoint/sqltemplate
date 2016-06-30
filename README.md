@@ -18,24 +18,25 @@ Given the program:
 
         private static void run() throws Exception {
             try (Connection conn = DriverManager.getConnection("jdbc:h2:~/test", "sa", "")) {
-                SQLCommand cmd = SQLCommand.begin()
+                SQLTemplate.builder(conn)
                     .noAutoCommit()
                     .prepareStatement("CREATE TABLE IF NOT EXISTS TEST(ID INT PRIMARY KEY, NAME VARCHAR(255) DEFAULT '')")
-                    .execute()
+                    .executeUpdate()
                     .prepareStatement("DELETE TEST")
-                    .execute()
+                    .executeUpdate()
                     .commit()
                     .prepareStatement("INSERT INTO TEST (ID, NAME) VALUES (?, ?)")
-                    .execute(new Object[] { 1, "A" })
-                    .execute(new Object[] { 2, "B" })
+                    .executeUpdate(new Object[] { 1, "A" })
+                    .executeUpdate(new Object[] { 2, "B" })
                     .commit()
-                    .execute(new Object[] { 3, "C" })
-                    .execute(new Object[] { 4, "D" })
+                    .executeUpdate(new Object[] { 3, "C" })
+                    .executeUpdate(new Object[] { 4, "D" })
                     .rollback()
                     .prepareStatement("SELECT * FROM TEST")
-                    .executeQuery();
-
-                SQLTemplate.with(conn).execute(cmd).get().stream().map(columns -> columns[1]).forEach(System.out::println);
+                    .executeQuery()
+                    .build()
+                    .run()
+                    .get().stream().map(columns -> columns[1]).forEach(System.out::println);
             } finally {
             }
         }

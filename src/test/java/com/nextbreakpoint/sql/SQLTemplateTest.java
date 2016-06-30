@@ -14,7 +14,6 @@ import static org.mockito.Matchers.any;
 import static org.mockito.Mockito.doNothing;
 import static org.mockito.Mockito.doThrow;
 import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
@@ -36,161 +35,56 @@ public class SQLTemplateTest {
 	public ExpectedException exception = ExpectedException.none();
 	
 	@Test
-	public void create_givenConnectionIsNull_shouldThrowException() {
+	public void shouldThrowException() {
 		exception.expect(NullPointerException.class);
-		SQLTemplate.with(null);
+		SQLTemplate.builder(null);
 	}
 
 	@Test
-	public void create_givenConnectionIsNotNull_shouldReturnSQL() {
+	public void shouldReturnNotNull() {
 		Connection conn = mock(Connection.class);
-		assertNotNull(SQLTemplate.with(conn));
+		assertNotNull(SQLTemplate.builder(conn));
 	}
 
 	@Test
-	public void execute_givenCommandIsNull_shouldThrowException() {
-		exception.expect(NullPointerException.class);
-		Connection conn = mock(Connection.class);
-		SQLTemplate.with(conn).execute((SQLCommand)null);
-	}
-
-	@Test
-	public void execute_givenCommandIsNotEmpty_shouldCallCommand() {
-		Connection conn = mock(Connection.class);
-		SQLCommand cmd = mock(SQLCommand.class);
-		when(cmd.apply(any(SQLDriver.class))).thenReturn(SQLDriver.success(SQLDriver.create(conn)));
-		SQLTemplate.with(conn).execute(cmd);
-		verify(cmd, times(1)).apply(any(SQLDriver.class));
-	}
-
-	@Test
-	public void execute_givenCommandIsNoAutoCommit_shouldSetAutoCommitToFalse() throws Exception {
-		Connection conn = mock(Connection.class);
-		SQLTemplate.with(conn).execute(SQLCommand.begin().noAutoCommit());
-		verify(conn, times(1)).setAutoCommit(false);
-	}
-
-	@Test
-	public void execute_givenCommandIsAutoCommit_shouldSetAutoCommitToTrue() throws Exception {
-		Connection conn = mock(Connection.class);
-		SQLTemplate.with(conn).execute(SQLCommand.begin().autoCommit());
-		verify(conn, times(1)).setAutoCommit(true);
-	}
-
-	@Test
-	public void execute_givenCommandIsPrepareStatement_shouldCallPrepareStatement() throws Exception {
-		Connection conn = mock(Connection.class);
-		String stmtSql = "select * from test";
-		SQLTemplate.with(conn).execute(SQLCommand.begin().prepareStatement(stmtSql));
-		verify(conn, times(1)).prepareStatement(stmtSql);
-	}
-
-	@Test
-	public void execute_givenCommandIsPrepareStatementAndThenExecute_shouldCallExecuteUpdate() throws Exception {
-		Connection conn = mock(Connection.class);
-		PreparedStatement stmt = mock(PreparedStatement.class);
-		String stmtSql = "delete from test";
-		when(conn.prepareStatement(stmtSql)).thenReturn(stmt);
-		SQLTemplate.with(conn).execute(SQLCommand.begin().prepareStatement(stmtSql).execute());
-		verify(stmt, times(1)).executeUpdate();
-	}
-
-	@Test
-	public void execute_givenCommandIsPrepareStatementAndThenExecuteQuery_shouldCallExecuteUpdate() throws Exception {
-		Connection conn = mock(Connection.class);
-		PreparedStatement stmt = mock(PreparedStatement.class);
-		String stmtSql = "select * from test";
-		when(conn.prepareStatement(stmtSql)).thenReturn(stmt);
-		SQLTemplate.with(conn).execute(SQLCommand.begin().prepareStatement(stmtSql).executeQuery());
-		verify(stmt, times(1)).executeQuery();
-	}
-
-	@Test
-	public void execute_givenCommandIsPrepareStatementAndThenExecuteAndThenCommit_shouldCallCommit() throws Exception {
-		Connection conn = mock(Connection.class);
-		PreparedStatement stmt = mock(PreparedStatement.class);
-		String stmtSql = "select * from test";
-		when(conn.prepareStatement(stmtSql)).thenReturn(stmt);
-		when(stmt.executeUpdate()).thenReturn(1);
-		SQLTemplate.with(conn).execute(SQLCommand.begin().prepareStatement(stmtSql).execute().commit());
-		verify(conn, times(1)).commit();
-	}
-
-	@Test
-	public void execute_givenCommandIsPrepareStatementAndThenExecuteAndThenRollback_shouldCallRollback() throws Exception {
-		Connection conn = mock(Connection.class);
-		PreparedStatement stmt = mock(PreparedStatement.class);
-		String stmtSql = "select * from test";
-		when(conn.prepareStatement(stmtSql)).thenReturn(stmt);
-		when(stmt.executeUpdate()).thenReturn(1);
-		SQLTemplate.with(conn).execute(SQLCommand.begin().prepareStatement(stmtSql).execute().rollback());
-		verify(conn, times(1)).rollback();
-	}
-
-//	@Test
-//	public void execute_givenCommandReturnsFailure_shouldNotHaveResult() throws Exception {
-//		Connection conn = mock(Connection.class);
-//		PreparedStatement stmt = mock(PreparedStatement.class);
-//		String stmtSql = "select * from test";
-//		when(conn.prepareStatement(stmtSql)).thenReturn(stmt);
-//		when(stmt.executeUpdate()).thenReturn(10);
-//		Try<List<Object[]>, SQLTemplateException> tryStream = SQLTemplate.with(conn).execute(SQLCommand.begin(sql -> SQLDriver.failure(new Exception())));
-//		assertTrue(tryStream.isFailure());
-//		assertTrue(!tryStream.isPresent());
-//	}
-//
-//	@Test
-//	public void execute_givenCommandReturnsSuccess_shouldReturnEmptyStream() throws Exception {
-//		Connection conn = mock(Connection.class);
-//		PreparedStatement stmt = mock(PreparedStatement.class);
-//		String stmtSql = "select * from test";
-//		when(conn.prepareStatement(stmtSql)).thenReturn(stmt);
-//		when(stmt.executeUpdate()).thenReturn(10);
-//		Try<List<Object[]>, SQLTemplateException> tryStream = SQLTemplate.with(conn).execute(SQLCommand.begin(sql -> SQLDriver.success(sql)));
-//		assertFalse(tryStream.isFailure());
-//		assertNotNull(tryStream.get());
-//		assertEquals(0L, tryStream.get().size());
-//	}
-
-	@Test
-	public void execute_givenCommandIsExecute_shouldReturnEmptyStream() throws Exception {
+	public void shouldReturnEmptyListWhenExecuteUpdate() throws Exception {
 		Connection conn = mock(Connection.class);
 		PreparedStatement stmt = mock(PreparedStatement.class);
 		String stmtSql = "select * from test";
 		when(conn.prepareStatement(stmtSql)).thenReturn(stmt);
 		when(stmt.executeUpdate()).thenReturn(10);
-		Try<List<Object[]>, SQLTemplateException> tryStream = SQLTemplate.with(conn).execute(SQLCommand.begin().execute());
-		assertTrue(tryStream.isFailure());
-		assertFalse(tryStream.isPresent());
+		Try<List<Object[]>, SQLTemplateException> template = SQLTemplate.builder(conn).executeUpdate().build().run();
+		assertTrue(template.isFailure());
+		assertFalse(template.isPresent());
 	}
 
 	@Test
-	public void execute_givenCommandIsExecuteQuery_shouldReturnEmptyStream() throws Exception {
+	public void shouldReturnEmptyListWhenExecuteQuery() throws Exception {
 		Connection conn = mock(Connection.class);
 		PreparedStatement stmt = mock(PreparedStatement.class);
 		String stmtSql = "select * from test";
 		when(conn.prepareStatement(stmtSql)).thenReturn(stmt);
 		when(stmt.executeUpdate()).thenReturn(10);
-		Try<List<Object[]>, SQLTemplateException> tryStream = SQLTemplate.with(conn).execute(SQLCommand.begin().executeQuery());
-		assertTrue(tryStream.isFailure());
-		assertFalse(tryStream.isPresent());
+		Try<List<Object[]>, SQLTemplateException> template = SQLTemplate.builder(conn).executeQuery().build().run();
+		assertTrue(template.isFailure());
+		assertFalse(template.isPresent());
 	}
 
 	@Test
-	public void execute_givenCommandIsPrepareStatementAndThenExecute_shouldReturnStream() throws Exception {
+	public void shouldReturnNotEmptyListWhenExecuteUpdate() throws Exception {
 		Connection conn = mock(Connection.class);
 		PreparedStatement stmt = mock(PreparedStatement.class);
 		String stmtSql = "select * from test";
 		when(conn.prepareStatement(stmtSql)).thenReturn(stmt);
 		when(stmt.executeUpdate()).thenReturn(10);
-		Try<List<Object[]>, SQLTemplateException> tryStream = SQLTemplate.with(conn).execute(SQLCommand.begin().prepareStatement(stmtSql).execute());
-		assertFalse(tryStream.isFailure());
-		assertNotNull(tryStream.get());
-		assertEquals(10L, tryStream.get().get(0)[0]);
+		Try<List<Object[]>, SQLTemplateException> template = SQLTemplate.builder(conn).prepareStatement(stmtSql).executeUpdate().build().run();
+		assertFalse(template.isFailure());
+		assertNotNull(template.get());
+		assertEquals(10L, template.get().get(0)[0]);
 	}
 
 	@Test
-	public void execute_givenCommandIsPrepareStatementAndThenExecuteQuery_shouldReturnStream() throws Exception {
+	public void shouldReturnNotEmptyListWhenExecuteQuery() throws Exception {
 		Connection conn = mock(Connection.class);
 		PreparedStatement stmt = mock(PreparedStatement.class);
 		ResultSet rs = mock(ResultSet.class);
@@ -204,84 +98,54 @@ public class SQLTemplateTest {
 		when(rs.getMetaData()).thenReturn(meta);
 		when(rs.getObject(1)).thenReturn(1L);
 		when(rs.getObject(2)).thenReturn("a");
-		Try<List<Object[]>, SQLTemplateException> tryStream = SQLTemplate.with(conn).execute(SQLCommand.begin().prepareStatement(stmtSql).executeQuery());
-		assertFalse(tryStream.isFailure());
-		assertNotNull(tryStream.get());
-		Object[] findFirst = tryStream.get().get(0);
+		Try<List<Object[]>, SQLTemplateException> template = SQLTemplate.builder(conn).prepareStatement(stmtSql).executeQuery().build().run();
+		assertFalse(template.isFailure());
+		assertNotNull(template.get());
+		Object[] findFirst = template.get().get(0);
 		assertEquals(1L, findFirst[0]);
 		assertEquals("a", findFirst[1]);
 	}
 
-//	@Test
-//	public void execute_givenCommandIsPrepareStatementAndThenExecuteQueryAndThenPeek_shouldCaptureResult() throws Exception {
-//		@SuppressWarnings("unchecked")
-//		Consumer<Object[]> consumer = mock(Consumer.class);
-//		Connection conn = mock(Connection.class);
-//		PreparedStatement stmt = mock(PreparedStatement.class);
-//		ResultSet rs = mock(ResultSet.class);
-//		ResultSetMetaData meta = mock(ResultSetMetaData.class);
-//		String stmtSql = "select * from test";
-//		when(conn.prepareStatement(stmtSql)).thenReturn(stmt);
-//		when(stmt.executeQuery()).thenReturn(rs);
-//		doNothing().when(rs).close();
-//		when(rs.next()).thenReturn(true);
-//		when(meta.getColumnCount()).thenReturn(2);
-//		when(rs.getMetaData()).thenReturn(meta);
-//		when(rs.getObject(1)).thenReturn(1L);
-//		when(rs.getObject(2)).thenReturn("a");
-//		Try<List<Object[]>, SQLTemplateException> tryStream = SQLTemplate.with(conn).execute(SQLCommand.begin(sql -> sql.prepareStatement(stmtSql)).andThen(sql -> sql.executeQuery())).flatMap(sql -> SQLDriver.success(sql.get()).peek(consumer));
-//		assertFalse(tryStream.isFailure());
-//		assertNotNull(tryStream.get());
-//		verify(consumer, times(1)).accept(any(SQLDriver.class));
-//	}
-
-//	@Test
-//	public void execute_givenCommandThrowsException_shouldReturnFailure() throws Exception {
-//		Connection conn = mock(Connection.class);
-//		Try<List<Object[]>, SQLTemplateException> trySQL = SQLTemplate.with(conn).execute(SQLCommand.begin(sql -> SQLDriver.with(() -> { throw new Exception(); })));
-//		assertTrue(trySQL.isFailure());
-//	}
-
 	@Test
-	public void execute_givenCommandIsNoAutoCommitAndConnectionThrowsException_shouldReturnFailure() throws Exception {
+	public void shouldReturnFailureWhenSetAutoCommitFalseThrowsException() throws Exception {
 		Connection conn = mock(Connection.class);
 		doThrow(SQLException.class).when(conn).setAutoCommit(false);
-		Try<List<Object[]>, SQLTemplateException> trySQL = SQLTemplate.with(conn).execute(SQLCommand.begin().noAutoCommit());
-		assertTrue(trySQL.isFailure());
+		Try<List<Object[]>, SQLTemplateException> template = SQLTemplate.builder(conn).noAutoCommit().build().run();
+		assertTrue(template.isFailure());
 	}
 
 	@Test
-	public void execute_givenCommandIsAutoCommitAndConnectionThrowsException_shouldReturnFailure() throws Exception {
+	public void shouldReturnFailureWhenSetAutoCommitTrueThrowsException() throws Exception {
 		Connection conn = mock(Connection.class);
 		doThrow(SQLException.class).when(conn).setAutoCommit(true);
-		Try<List<Object[]>, SQLTemplateException> trySQL = SQLTemplate.with(conn).execute(SQLCommand.begin().autoCommit());
-		assertTrue(trySQL.isFailure());
+		Try<List<Object[]>, SQLTemplateException> template = SQLTemplate.builder(conn).autoCommit().build().run();
+		assertTrue(template.isFailure());
 	}
 
 	@Test
-	public void execute_givenCommandIsCommitAndConnectionThrowsException_shouldReturnFailure() throws Exception {
+	public void shouldReturnFailureWhenSetCommitThrowsException() throws Exception {
 		Connection conn = mock(Connection.class);
 		doThrow(SQLException.class).when(conn).commit();
-		Try<List<Object[]>, SQLTemplateException> trySQL = SQLTemplate.with(conn).execute(SQLCommand.begin().commit());
-		assertTrue(trySQL.isFailure());
+		Try<List<Object[]>, SQLTemplateException> template = SQLTemplate.builder(conn).commit().build().run();
+		assertTrue(template.isFailure());
 	}
 
 	@Test
-	public void execute_givenCommandIsRollbackAndConnectionThrowsException_shouldReturnFailure() throws Exception {
+	public void shouldReturnFailureWhenSetRollbackThrowsException() throws Exception {
 		Connection conn = mock(Connection.class);
 		doThrow(SQLException.class).when(conn).rollback();
-		Try<List<Object[]>, SQLTemplateException> trySQL = SQLTemplate.with(conn).execute(SQLCommand.begin().rollback());
-		assertTrue(trySQL.isFailure());
+		Try<List<Object[]>, SQLTemplateException> template = SQLTemplate.builder(conn).rollback().build().run();
+		assertTrue(template.isFailure());
 	}
 
 	@Test
-	public void execute_givenCommandIsPrepareStatementAndThenExecuteQueryAndConnectionThrowsException_shouldReturnFailure() throws Exception {
+	public void shouldReturnFailureWhenPrepareStatementThrowsException() throws Exception {
 		Connection conn = mock(Connection.class);
 		PreparedStatement stmt = mock(PreparedStatement.class);
 		doThrow(SQLException.class).when(stmt).setObject(any(Integer.class), any(Object.class));
 		String stmtSql = "select * from test where id=?";
 		when(conn.prepareStatement(stmtSql)).thenReturn(stmt);
-		Try<List<Object[]>, SQLTemplateException> trySQL = SQLTemplate.with(conn).execute(SQLCommand.begin().prepareStatement(stmtSql).executeQuery(new String[] { "X" }));
-		assertTrue(trySQL.isFailure());
+		Try<List<Object[]>, SQLTemplateException> template = SQLTemplate.builder(conn).prepareStatement(stmtSql).executeQuery(new String[] { "X" }).build().run();
+		assertTrue(template.isFailure());
 	}
 }
