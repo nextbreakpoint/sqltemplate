@@ -15,14 +15,14 @@ import java.util.stream.Stream;
 import java.util.stream.StreamSupport;
 
 /**
- * Encapsulates the result of executing a statement. 
+ * Encapsulates the result with executing a statement.
  * 
  * @author Andrea
  *
  */
-public abstract class SQLResult {
+abstract class SQLResult {
 	/**
-	 * Creates stream from result values.  
+	 * Creates a stream from the result set.
 	 * @return the stream
 	 */
 	public abstract Stream<Object[]> stream();
