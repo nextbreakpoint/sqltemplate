@@ -18,11 +18,11 @@ import com.nextbreakpoint.Try;
  * @author Andrea
  *
  */
-public class SQLStatement {
+class SQLStatement {
 	private final PreparedStatement st;
 
 	/**
-	 * Creates new instance from given prepared statement.
+	 * Creates a new instance from given prepared statement.
 	 * @param st the prepared statement
 	 */
 	public SQLStatement(PreparedStatement st) {

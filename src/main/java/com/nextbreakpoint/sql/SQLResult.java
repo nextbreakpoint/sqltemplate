@@ -20,9 +20,9 @@ import java.util.stream.StreamSupport;
  * @author Andrea
  *
  */
-public abstract class SQLResult {
+abstract class SQLResult {
 	/**
-	 * Creates stream from result get.
+	 * Creates a stream from the result set.
 	 * @return the stream
 	 */
 	public abstract Stream<Object[]> stream();

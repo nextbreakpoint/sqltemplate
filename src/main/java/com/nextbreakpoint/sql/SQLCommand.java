@@ -31,7 +31,7 @@ public class SQLCommand {
 	}
 
 	/**
-	 * Applies the command to given SQLTemplate and returns the result as Try instance.
+	 * Applies the command to given SQLDriver and returns the result as Try instance.
 	 * @param driver the driver
 	 * @return the result
 	 */
@@ -49,7 +49,6 @@ public class SQLCommand {
 
 	/**
 	 * Concatenates a command with this command.
-	 * Same as andThen(sql -&gt; sql.autoCommit()).
 	 * @return new command
 	 */
 	public SQLCommand autoCommit() {
@@ -58,7 +57,6 @@ public class SQLCommand {
 
 	/**
 	 * Concatenates a command with this command.
-	 * Same as andThen(sql -&gt; sql.noAutoCommit()).
 	 * @return new command
 	 */
 	public SQLCommand noAutoCommit() {
@@ -67,7 +65,6 @@ public class SQLCommand {
 	
 	/**
 	 * Concatenates a command with this command.
-	 * Same as andThen(sql -&gt; sql.commit()).
 	 * @return new command
 	 */
 	public SQLCommand commit() {
@@ -76,7 +73,6 @@ public class SQLCommand {
 	
 	/**
 	 * Concatenates a command with this command.
-	 * Same as andThen(sql -&gt; sql.rollback()).
 	 * @return new command
 	 */
 	public SQLCommand rollback() {
@@ -85,7 +81,6 @@ public class SQLCommand {
 
 	/**
 	 * Concatenates a command with this command.
-	 * Same as andThen(sql -&gt; sql.prepareStatement(sqlStmt)).
 	 * @param sqlStmt the SQL statement
 	 * @return new command
 	 */
@@ -95,7 +90,6 @@ public class SQLCommand {
 	
 	/**
 	 * Concatenates a command with this command.
-	 * Same as andThen(sql -&gt; sql.execute(params)).
 	 * @param params the parameters
 	 * @return new command
 	 */
@@ -105,7 +99,6 @@ public class SQLCommand {
 
 	/**
 	 * Concatenates a command with this command.
-	 * Same as andThen(sql -&gt; sql.executeQuery(params)).
 	 * @param params the parameters
 	 * @return new command
 	 */
@@ -115,7 +108,6 @@ public class SQLCommand {
 
 	/**
 	 * Concatenates a command with this command.
-	 * Same as andThen(sql -&gt; sql.execute()).
 	 * @return new command
 	 */
 	public SQLCommand execute() {
@@ -124,7 +116,6 @@ public class SQLCommand {
 
 	/**
 	 * Concatenates a command with this command.
-	 * Same as andThen(sql -&gt; sql.executeQuery()).
 	 * @return new command
 	 */
 	public SQLCommand executeQuery() {

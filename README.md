@@ -1,6 +1,6 @@
-# SQLTemplate 1.2
+# SQLTemplate 1.3.0
 
-SQLTemplate implements a functional API for executing SQL statements using JDBC in Java
+SQLTemplate implements a functional API for executing SQL statements using JDBC
 
 ## Example
 

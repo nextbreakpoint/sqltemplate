@@ -24,7 +24,7 @@ import java.util.stream.Stream;
  * @author Andrea
  *
  */
-public class SQLDriver {
+class SQLDriver {
 	private final Connection conn;
 	private final Optional<SQLResult> sqlResult;
 	private final Optional<SQLStatement> sqlStatement;
@@ -160,7 +160,7 @@ public class SQLDriver {
 	}
 
 	/**
-	 * Creates new instance from given connection. 
+	 * Creates a new instance from given connection.
 	 * @param conn the connection
 	 * @return new instance
 	 */

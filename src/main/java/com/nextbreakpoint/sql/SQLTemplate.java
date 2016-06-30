@@ -13,7 +13,7 @@ import com.nextbreakpoint.Try;
 import java.util.List;
 
 /**
- * SQLTemplate implements a functional API for executing SQL statements using JDBC in Java 8.
+ * SQLTemplate implements a functional API for executing SQL statements.
  * 
  * @author Andrea
  *
@@ -27,7 +27,7 @@ public class SQLTemplate {
 	}
 
 	/**
-	 * Attempts to execute the given command and returns the result as Try instance.  
+	 * Attempts to execute the given command and returns the result as Try instance.
 	 * @param command the command
 	 * @return the result
 	 */
@@ -36,9 +36,9 @@ public class SQLTemplate {
 	}
 
 	/**
-	 * Creates new instance from given connection. 
+	 * Creates a new instance from given connection.
 	 * @param conn the connection
-	 * @return new instance
+	 * @return the new instance
 	 */
 	public static SQLTemplate with(Connection conn) {
 		return new SQLTemplate(conn);

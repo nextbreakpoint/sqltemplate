@@ -9,22 +9,22 @@ package com.nextbreakpoint.sql;
 import com.nextbreakpoint.Try;
 
 /**
- * Represents a JDBC operations.
+ * Represents a sequence of JDBC operations.
  * 
  * @author Andrea
  *
  */
 @FunctionalInterface
-public interface SQLFunction {
+interface SQLFunction {
 	/**
-	 * Invoke operations on given SQLDriver and returns the result as Try instance.
+	 * Invokes operations on given SQLDriver and returns the result as Try instance.
 	 * @param sql the SQLDriver
 	 * @return the result
 	 */
 	public Try<SQLDriver, SQLTemplateException> apply(SQLDriver sql);
 
 	/**
-	 * Concatenate function with given function.
+	 * Concatenates a function with another function.
 	 * @param other the function
 	 * @return the new function
 	 */
