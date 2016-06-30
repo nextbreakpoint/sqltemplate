@@ -8,7 +8,6 @@ package com.nextbreakpoint.sql;
 
 import java.sql.Connection;
 import java.util.Objects;
-import java.util.stream.Stream;
 
 import com.nextbreakpoint.Try;
 import java.util.List;
@@ -20,11 +19,11 @@ import java.util.List;
  *
  */
 public class SQLTemplate {
-	private final SQLDriver driver;
+	private final Connection conn;
 
-	private SQLTemplate(SQLDriver driver) {
-		Objects.requireNonNull(driver);
-		this.driver = driver;
+	private SQLTemplate(Connection conn) {
+		Objects.requireNonNull(conn);
+		this.conn = conn;
 	}
 
 	/**
@@ -32,8 +31,8 @@ public class SQLTemplate {
 	 * @param command the command
 	 * @return the result
 	 */
-	public Try<SQLTemplate, SQLTemplateException> execute(SQLCommand command) {
-		return command.apply(driver).map(driver -> new SQLTemplate(driver));
+	public Try<List<Object[]>, SQLTemplateException> execute(SQLCommand command) {
+		return command.apply(SQLDriver.create(conn)).map(driver -> driver.values());
 	}
 
 	/**
@@ -41,15 +40,7 @@ public class SQLTemplate {
 	 * @param conn the connection
 	 * @return new instance
 	 */
-	public static SQLTemplate of(Connection conn) {
-		return new SQLTemplate(SQLDriver.create(conn));
-	}
-
-	/**
-	 * Returns the result as list of array of objects.
-	 * @return the list
-	 */
-	public List<Object[]> get() {
-		return driver.values();
+	public static SQLTemplate with(Connection conn) {
+		return new SQLTemplate(conn);
 	}
 }

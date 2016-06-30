@@ -6,6 +6,7 @@
  */
 package com.nextbreakpoint.sql;
 
+import java.util.Objects;
 import java.util.function.Consumer;
 import java.util.stream.Stream;
 
@@ -17,39 +18,33 @@ import com.nextbreakpoint.Try;
  * @author Andrea
  *
  */
-@FunctionalInterface
-public interface SQLCommand {
+public class SQLCommand {
+	private final SQLFunction function;
+
+	private SQLCommand(SQLFunction function) {
+		Objects.requireNonNull(function);
+		this.function = function;
+	}
+
+	private static SQLCommand create(SQLFunction f) {
+		return new SQLCommand(f);
+	}
+
 	/**
 	 * Applies the command to given SQLTemplate and returns the result as Try instance.
-	 * @param sql the SQLTemplate
+	 * @param driver the driver
 	 * @return the result
 	 */
-	public Try<SQLDriver, SQLTemplateException> apply(SQLDriver sql);
+	public Try<SQLDriver, SQLTemplateException> apply(SQLDriver driver) {
+		return function.apply(driver);
+	}
 
 	/**
 	 * Creates a new empty command.
 	 * @return new command
 	 */
 	public static SQLCommand begin() {
-		return sql -> Try.success(SQLDriver.defaultMapper(), sql);
-	}
-
-	/**
-	 * Creates a new command from given command.
-	 * @param command the command
-	 * @return new command
-	 */
-	public static SQLCommand begin(SQLCommand command) {
-		return sql -> command.apply(sql);
-	}
-
-	/**
-	 * Concatenates a command with this command.
-	 * @param command the command
-	 * @return new command
-	 */
-	public default SQLCommand andThen(SQLCommand command) {
-		return sql1 -> apply(sql1).flatMap(sql2 -> command.apply(sql2));
+		return create(sql -> Try.success(SQLDriver.defaultMapper(), sql));
 	}
 
 	/**
@@ -57,8 +52,8 @@ public interface SQLCommand {
 	 * Same as andThen(sql -&gt; sql.autoCommit()).
 	 * @return new command
 	 */
-	public default SQLCommand autoCommit() {
-		return this.andThen(sql -> sql.autoCommit());
+	public SQLCommand autoCommit() {
+		return create(function.andThen(driver -> driver.autoCommit()));
 	}
 
 	/**
@@ -66,8 +61,8 @@ public interface SQLCommand {
 	 * Same as andThen(sql -&gt; sql.noAutoCommit()).
 	 * @return new command
 	 */
-	public default SQLCommand noAutoCommit() {
-		return this.andThen(sql -> sql.noAutoCommit());
+	public SQLCommand noAutoCommit() {
+		return create(function.andThen(driver -> driver.noAutoCommit()));
 	}
 	
 	/**
@@ -75,8 +70,8 @@ public interface SQLCommand {
 	 * Same as andThen(sql -&gt; sql.commit()).
 	 * @return new command
 	 */
-	public default SQLCommand commit() {
-		return this.andThen(sql -> sql.commit());
+	public SQLCommand commit() {
+		return create(function.andThen(driver -> driver.commit()));
 	}
 	
 	/**
@@ -84,8 +79,8 @@ public interface SQLCommand {
 	 * Same as andThen(sql -&gt; sql.rollback()).
 	 * @return new command
 	 */
-	public default SQLCommand rollback() {
-		return this.andThen(sql -> sql.rollback());
+	public SQLCommand rollback() {
+		return create(function.andThen(driver -> driver.rollback()));
 	}
 
 	/**
@@ -94,8 +89,8 @@ public interface SQLCommand {
 	 * @param sqlStmt the SQL statement
 	 * @return new command
 	 */
-	public default SQLCommand prepareStatement(String sqlStmt) {
-		return this.andThen(sql -> sql.prepareStatement(sqlStmt));
+	public SQLCommand prepareStatement(String sqlStmt) {
+		return create(function.andThen(driver -> driver.prepareStatement(sqlStmt)));
 	}
 	
 	/**
@@ -104,8 +99,8 @@ public interface SQLCommand {
 	 * @param params the parameters
 	 * @return new command
 	 */
-	public default SQLCommand execute(Object[] params) {
-		return this.andThen(sql -> sql.execute(params));
+	public SQLCommand execute(Object[] params) {
+		return create(function.andThen(driver -> driver.execute(params)));
 	}
 
 	/**
@@ -114,8 +109,8 @@ public interface SQLCommand {
 	 * @param params the parameters
 	 * @return new command
 	 */
-	public default SQLCommand executeQuery(Object[] params) {
-		return this.andThen(sql -> sql.executeQuery(params));
+	public SQLCommand executeQuery(Object[] params) {
+		return create(function.andThen(driver -> driver.executeQuery(params)));
 	}
 
 	/**
@@ -123,8 +118,8 @@ public interface SQLCommand {
 	 * Same as andThen(sql -&gt; sql.execute()).
 	 * @return new command
 	 */
-	public default SQLCommand execute() {
-		return this.andThen(sql -> sql.execute());
+	public SQLCommand execute() {
+		return create(function.andThen(driver -> driver.execute()));
 	}
 
 	/**
@@ -132,15 +127,7 @@ public interface SQLCommand {
 	 * Same as andThen(sql -&gt; sql.executeQuery()).
 	 * @return new command
 	 */
-	public default SQLCommand executeQuery() {
-		return this.andThen(sql -> sql.executeQuery());
+	public SQLCommand executeQuery() {
+		return create(function.andThen(driver -> driver.executeQuery()));
 	}
-//
-//	/**
-//	 * Applies the command and consumes the result if present.
-//	 * @return the result
-//	 */
-//	public default Try<Stream<Object[]>, SQLTemplateException> stream() {
-//		return this.andThen(sql -> this.apply(sql).map(d -> d.stream()));
-//	}
 }

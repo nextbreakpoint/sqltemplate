@@ -36,10 +36,9 @@ public class SQLTemplateMain {
 				.execute(new Object[] { 4, "D" })
 				.rollback()
 				.prepareStatement("SELECT * FROM TEST")
-				.executeQuery()
-				/*.peek(sql -> sql.stream().map(columns -> columns[1]).forEach(System.out::println))*/;
-			
-			SQLTemplate.of(conn).execute(cmd).ifPresentOrThrow(sql -> { System.out.println("done"); });
+				.executeQuery();
+
+			SQLTemplate.with(conn).execute(cmd).get().stream().map(columns -> columns[1]).forEach(System.out::println);
 		} finally {
 		}
 	}

@@ -97,7 +97,7 @@ public class SQLDriver {
 	}
 
 	/**
-	 * Attempts to of a prepared statement and returns the result as Try instance.
+	 * Attempts to with a prepared statement and returns the result as Try instance.
 	 * @param sql the SQL statement
 	 * @return the result
 	 */
@@ -148,18 +148,14 @@ public class SQLDriver {
 	}
 
 	/**
-	 * Returns the result as list of array of objects.
+	 * Returns the result as list with array with objects.
 	 * @return the list
 	 */
 	public List<Object[]> values() {
 		return stream().collect(Collectors.toList());
 	}
 
-	/**
-	 * Returns the result as stream of array of objects.
-	 * @return the stream
-	 */
-	public Stream<Object[]> stream() {
+	private Stream<Object[]> stream() {
 		return sqlResult.map(s -> s.stream()).orElse(Stream.empty());
 	}
 

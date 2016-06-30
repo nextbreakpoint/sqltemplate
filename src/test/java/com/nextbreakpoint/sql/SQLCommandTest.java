@@ -95,13 +95,4 @@ public class SQLCommandTest {
 		SQLCommand.begin().executeQuery(new String[] {"X", "Y"}).apply(sql);
 		verify(sql, times(1)).executeQuery(new String[] {"X", "Y"});
 	}
-
-//	@Test
-//	public void apply_givenCommandIsPeek_shouldCallConsumer() {
-//		SQLDriver sql = mock(SQLDriver.class);
-//		@SuppressWarnings("unchecked")
-//		Consumer<SQLDriver> consumer = mock(Consumer.class);
-//		SQLCommand.begin().peek(consumer).apply(sql);
-//		verify(consumer, times(1)).accept(sql);
-//	}
 }
