@@ -33,17 +33,11 @@ import com.nextbreakpoint.Try;
 public class SQLTemplateTest {
 	@Rule
 	public ExpectedException exception = ExpectedException.none();
-	
-	@Test
-	public void shouldThrowException() {
-		exception.expect(NullPointerException.class);
-		SQLTemplate.builder(null);
-	}
 
 	@Test
 	public void shouldReturnNotNull() {
 		Connection conn = mock(Connection.class);
-		assertNotNull(SQLTemplate.builder(conn));
+		assertNotNull(SQLTemplate.builder());
 	}
 
 	@Test
@@ -53,7 +47,7 @@ public class SQLTemplateTest {
 		String stmtSql = "select * from test";
 		when(conn.prepareStatement(stmtSql)).thenReturn(stmt);
 		when(stmt.executeUpdate()).thenReturn(10);
-		Try<List<Object[]>, SQLTemplateException> template = SQLTemplate.builder(conn).executeUpdate().build().run();
+		Try<List<Object[]>, SQLTemplateException> template = SQLTemplate.builder().executeUpdate().build().run(conn);
 		assertTrue(template.isFailure());
 		assertFalse(template.isPresent());
 	}
@@ -65,7 +59,7 @@ public class SQLTemplateTest {
 		String stmtSql = "select * from test";
 		when(conn.prepareStatement(stmtSql)).thenReturn(stmt);
 		when(stmt.executeUpdate()).thenReturn(10);
-		Try<List<Object[]>, SQLTemplateException> template = SQLTemplate.builder(conn).executeQuery().build().run();
+		Try<List<Object[]>, SQLTemplateException> template = SQLTemplate.builder().executeQuery().build().run(conn);
 		assertTrue(template.isFailure());
 		assertFalse(template.isPresent());
 	}
@@ -77,7 +71,7 @@ public class SQLTemplateTest {
 		String stmtSql = "select * from test";
 		when(conn.prepareStatement(stmtSql)).thenReturn(stmt);
 		when(stmt.executeUpdate()).thenReturn(10);
-		Try<List<Object[]>, SQLTemplateException> template = SQLTemplate.builder(conn).prepareStatement(stmtSql).executeUpdate().build().run();
+		Try<List<Object[]>, SQLTemplateException> template = SQLTemplate.builder().prepareStatement(stmtSql).executeUpdate().build().run(conn);
 		assertFalse(template.isFailure());
 		assertNotNull(template.get());
 		assertEquals(10L, template.get().get(0)[0]);
@@ -98,7 +92,7 @@ public class SQLTemplateTest {
 		when(rs.getMetaData()).thenReturn(meta);
 		when(rs.getObject(1)).thenReturn(1L);
 		when(rs.getObject(2)).thenReturn("a");
-		Try<List<Object[]>, SQLTemplateException> template = SQLTemplate.builder(conn).prepareStatement(stmtSql).executeQuery().build().run();
+		Try<List<Object[]>, SQLTemplateException> template = SQLTemplate.builder().prepareStatement(stmtSql).executeQuery().build().run(conn);
 		assertFalse(template.isFailure());
 		assertNotNull(template.get());
 		Object[] findFirst = template.get().get(0);
@@ -110,7 +104,7 @@ public class SQLTemplateTest {
 	public void shouldReturnFailureWhenSetAutoCommitFalseThrowsException() throws Exception {
 		Connection conn = mock(Connection.class);
 		doThrow(SQLException.class).when(conn).setAutoCommit(false);
-		Try<List<Object[]>, SQLTemplateException> template = SQLTemplate.builder(conn).noAutoCommit().build().run();
+		Try<List<Object[]>, SQLTemplateException> template = SQLTemplate.builder().noAutoCommit().build().run(conn);
 		assertTrue(template.isFailure());
 	}
 
@@ -118,7 +112,7 @@ public class SQLTemplateTest {
 	public void shouldReturnFailureWhenSetAutoCommitTrueThrowsException() throws Exception {
 		Connection conn = mock(Connection.class);
 		doThrow(SQLException.class).when(conn).setAutoCommit(true);
-		Try<List<Object[]>, SQLTemplateException> template = SQLTemplate.builder(conn).autoCommit().build().run();
+		Try<List<Object[]>, SQLTemplateException> template = SQLTemplate.builder().autoCommit().build().run(conn);
 		assertTrue(template.isFailure());
 	}
 
@@ -126,7 +120,7 @@ public class SQLTemplateTest {
 	public void shouldReturnFailureWhenSetCommitThrowsException() throws Exception {
 		Connection conn = mock(Connection.class);
 		doThrow(SQLException.class).when(conn).commit();
-		Try<List<Object[]>, SQLTemplateException> template = SQLTemplate.builder(conn).commit().build().run();
+		Try<List<Object[]>, SQLTemplateException> template = SQLTemplate.builder().commit().build().run(conn);
 		assertTrue(template.isFailure());
 	}
 
@@ -134,7 +128,7 @@ public class SQLTemplateTest {
 	public void shouldReturnFailureWhenSetRollbackThrowsException() throws Exception {
 		Connection conn = mock(Connection.class);
 		doThrow(SQLException.class).when(conn).rollback();
-		Try<List<Object[]>, SQLTemplateException> template = SQLTemplate.builder(conn).rollback().build().run();
+		Try<List<Object[]>, SQLTemplateException> template = SQLTemplate.builder().rollback().build().run(conn);
 		assertTrue(template.isFailure());
 	}
 
@@ -145,7 +139,7 @@ public class SQLTemplateTest {
 		doThrow(SQLException.class).when(stmt).setObject(any(Integer.class), any(Object.class));
 		String stmtSql = "select * from test where id=?";
 		when(conn.prepareStatement(stmtSql)).thenReturn(stmt);
-		Try<List<Object[]>, SQLTemplateException> template = SQLTemplate.builder(conn).prepareStatement(stmtSql).executeQuery(new String[] { "X" }).build().run();
+		Try<List<Object[]>, SQLTemplateException> template = SQLTemplate.builder().prepareStatement(stmtSql).executeQuery(new String[] { "X" }).build().run(conn);
 		assertTrue(template.isFailure());
 	}
 }

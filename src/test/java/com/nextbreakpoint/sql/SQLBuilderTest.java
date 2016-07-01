@@ -24,49 +24,43 @@ public class SQLBuilderTest {
 	public ExpectedException exception = ExpectedException.none();
 	
 	@Test
-	public void shouldThrowException() {
-		exception.expect(NullPointerException.class);
-		assertNotNull(SQLBuilder.with(null).build());
-	}
-
-	@Test
 	public void shouldReturnNotNull() {
 		Connection conn = mock(Connection.class);
-		assertNotNull(SQLBuilder.with(conn).build());
+		assertNotNull(SQLBuilder.create().build());
 	}
 
 	@Test
 	public void shouldCallSetAutoCommitWithTrue() throws SQLException {
 		Connection conn = mock(Connection.class);
-		SQLBuilder.with(conn).autoCommit().build().run();
+		SQLBuilder.create().autoCommit().build().run(conn);
 		verify(conn, times(1)).setAutoCommit(true);
 	}
 
 	@Test
 	public void shouldCallSetAutoCommitWithFalse() throws SQLException {
 		Connection conn = mock(Connection.class);
-		SQLBuilder.with(conn).noAutoCommit().build().run();
+		SQLBuilder.create().noAutoCommit().build().run(conn);
 		verify(conn, times(1)).setAutoCommit(false);
 	}
 
 	@Test
 	public void shouldCallCommit() throws SQLException {
 		Connection conn = mock(Connection.class);
-		SQLBuilder.with(conn).commit().build().run();
+		SQLBuilder.create().commit().build().run(conn);
 		verify(conn, times(1)).commit();
 	}
 
 	@Test
 	public void shouldCallRollback() throws SQLException {
 		Connection conn = mock(Connection.class);
-		SQLBuilder.with(conn).rollback().build().run();
+		SQLBuilder.create().rollback().build().run(conn);
 		verify(conn, times(1)).rollback();
 	}
 
 	@Test
 	public void shouldCallPrepareStatement() throws SQLException {
 		Connection conn = mock(Connection.class);
-		SQLBuilder.with(conn).prepareStatement("SELECT * FROM TEST").build().run();
+		SQLBuilder.create().prepareStatement("SELECT * FROM TEST").build().run(conn);
 		verify(conn, times(1)).prepareStatement("SELECT * FROM TEST");
 	}
 
@@ -75,7 +69,7 @@ public class SQLBuilderTest {
 		Connection conn = mock(Connection.class);
 		PreparedStatement stmt = mock(PreparedStatement.class);
 		when(conn.prepareStatement("XXX")).thenReturn(stmt);
-		SQLBuilder.with(conn).prepareStatement("XXX").executeUpdate().build().run();
+		SQLBuilder.create().prepareStatement("XXX").executeUpdate().build().run(conn);
 		verify(stmt, times(1)).executeUpdate();
 	}
 
@@ -84,7 +78,7 @@ public class SQLBuilderTest {
 		Connection conn = mock(Connection.class);
 		PreparedStatement stmt = mock(PreparedStatement.class);
 		when(conn.prepareStatement("XXX")).thenReturn(stmt);
-		SQLBuilder.with(conn).prepareStatement("XXX").executeQuery().build().run();
+		SQLBuilder.create().prepareStatement("XXX").executeQuery().build().run(conn);
 		verify(stmt, times(1)).executeQuery();
 	}
 
@@ -93,7 +87,7 @@ public class SQLBuilderTest {
 		Connection conn = mock(Connection.class);
 		PreparedStatement stmt = mock(PreparedStatement.class);
 		when(conn.prepareStatement("XXX")).thenReturn(stmt);
-		SQLBuilder.with(conn).prepareStatement("XXX").executeUpdate(new String[] {"X", "Y"}).build().run();
+		SQLBuilder.create().prepareStatement("XXX").executeUpdate(new String[] {"X", "Y"}).build().run(conn);
 		verify(stmt, times(1)).setObject(1, "X");
 		verify(stmt, times(1)).setObject(2, "Y");
 		verify(stmt, times(1)).executeUpdate();
@@ -104,7 +98,7 @@ public class SQLBuilderTest {
 		Connection conn = mock(Connection.class);
 		PreparedStatement stmt = mock(PreparedStatement.class);
 		when(conn.prepareStatement("XXX")).thenReturn(stmt);
-		SQLBuilder.with(conn).prepareStatement("XXX").executeQuery(new String[] {"X", "Y"}).build().run();
+		SQLBuilder.create().prepareStatement("XXX").executeQuery(new String[] {"X", "Y"}).build().run(conn);
 		verify(stmt, times(1)).setObject(1, "X");
 		verify(stmt, times(1)).setObject(2, "Y");
 		verify(stmt, times(1)).executeQuery();

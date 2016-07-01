@@ -21,7 +21,7 @@ public class SQLTemplateMain {
 
 	private static void run() throws Exception {
 		try (Connection conn = DriverManager.getConnection("jdbc:h2:~/test", "sa", "")) {
-			SQLTemplate.builder(conn)
+			SQLTemplate.builder()
 				.noAutoCommit() 
 				.prepareStatement("CREATE TABLE IF NOT EXISTS TEST(ID INT PRIMARY KEY, NAME VARCHAR(255) DEFAULT '')") 
 				.executeUpdate()
@@ -38,7 +38,7 @@ public class SQLTemplateMain {
 				.prepareStatement("SELECT * FROM TEST")
 				.executeQuery()
 				.build()
-				.run()
+				.run(conn)
 				.get().stream().map(columns -> columns[1]).forEach(System.out::println);
 		} finally {
 		}

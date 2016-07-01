@@ -6,7 +6,6 @@
  */
 package com.nextbreakpoint.sql;
 
-import java.sql.Connection;
 import java.util.Objects;
 
 import com.nextbreakpoint.Try;
@@ -18,27 +17,23 @@ import com.nextbreakpoint.Try;
  *
  */
 public class SQLBuilder {
-	private final Connection connection;
 	private final SQLOperation operation;
 
-	private SQLBuilder(Connection connection, SQLOperation operation) {
-		Objects.requireNonNull(connection);
+	private SQLBuilder(SQLOperation operation) {
 		Objects.requireNonNull(operation);
-		this.connection = connection;
 		this.operation = operation;
 	}
 
-	private static SQLBuilder create(Connection connection, SQLOperation operation) {
-		return new SQLBuilder(connection, operation);
+	private static SQLBuilder create(SQLOperation operation) {
+		return new SQLBuilder(operation);
 	}
 
 	/**
 	 * Creates a new empty command.
-	 * @param connection the connection
 	 * @return new command
 	 */
-	public static SQLBuilder with(Connection connection) {
-		return create(connection, sql -> Try.success(SQLDriver.defaultMapper(), sql));
+	public static SQLBuilder create() {
+		return create(sql -> Try.success(SQLDriver.defaultMapper(), sql));
 	}
 
 	/**
@@ -46,7 +41,7 @@ public class SQLBuilder {
 	 * @return new command
 	 */
 	public SQLBuilder autoCommit() {
-		return create(connection, operation.andThen(driver -> driver.autoCommit()));
+		return create(operation.andThen(driver -> driver.autoCommit()));
 	}
 
 	/**
@@ -54,7 +49,7 @@ public class SQLBuilder {
 	 * @return new command
 	 */
 	public SQLBuilder noAutoCommit() {
-		return create(connection, operation.andThen(driver -> driver.noAutoCommit()));
+		return create(operation.andThen(driver -> driver.noAutoCommit()));
 	}
 	
 	/**
@@ -62,7 +57,7 @@ public class SQLBuilder {
 	 * @return new command
 	 */
 	public SQLBuilder commit() {
-		return create(connection, operation.andThen(driver -> driver.commit()));
+		return create(operation.andThen(driver -> driver.commit()));
 	}
 	
 	/**
@@ -70,7 +65,7 @@ public class SQLBuilder {
 	 * @return new command
 	 */
 	public SQLBuilder rollback() {
-		return create(connection, operation.andThen(driver -> driver.rollback()));
+		return create(operation.andThen(driver -> driver.rollback()));
 	}
 
 	/**
@@ -79,25 +74,25 @@ public class SQLBuilder {
 	 * @return new command
 	 */
 	public SQLBuilder prepareStatement(String sqlStmt) {
-		return create(connection, operation.andThen(driver -> driver.prepareStatement(sqlStmt)));
+		return create(operation.andThen(driver -> driver.prepareStatement(sqlStmt)));
 	}
 	
 	/**
-	 * Appends executeUpdate with arguments command.
+	 * Appends executeUpdate create arguments command.
 	 * @param params the parameters
 	 * @return new command
 	 */
 	public SQLBuilder executeUpdate(Object[] params) {
-		return create(connection, operation.andThen(driver -> driver.executeUpdate(params)));
+		return create(operation.andThen(driver -> driver.executeUpdate(params)));
 	}
 
 	/**
-	 * Appends executeQuery with arguments command.
+	 * Appends executeQuery create arguments command.
 	 * @param params the parameters
 	 * @return new command
 	 */
 	public SQLBuilder executeQuery(Object[] params) {
-		return create(connection, operation.andThen(driver -> driver.executeQuery(params)));
+		return create(operation.andThen(driver -> driver.executeQuery(params)));
 	}
 
 	/**
@@ -105,7 +100,7 @@ public class SQLBuilder {
 	 * @return new command
 	 */
 	public SQLBuilder executeUpdate() {
-		return create(connection, operation.andThen(driver -> driver.executeUpdate()));
+		return create(operation.andThen(driver -> driver.executeUpdate()));
 	}
 
 	/**
@@ -113,7 +108,7 @@ public class SQLBuilder {
 	 * @return new command
 	 */
 	public SQLBuilder executeQuery() {
-		return create(connection, operation.andThen(driver -> driver.executeQuery()));
+		return create(operation.andThen(driver -> driver.executeQuery()));
 	}
 
 	/**
@@ -121,6 +116,6 @@ public class SQLBuilder {
 	 * @return new template
 	 */
 	public SQLTemplate build() {
-		return new SQLTemplate(connection, operation);
+		return new SQLTemplate(operation);
 	}
 }

@@ -96,7 +96,7 @@ class SQLDriver {
 	}
 
 	/**
-	 * Attempts to with a prepared statement and returns the result as Try instance.
+	 * Attempts to create a prepared statement and returns the result as Try instance.
 	 * @param sql the SQL statement
 	 * @return the result
 	 */
@@ -109,7 +109,7 @@ class SQLDriver {
 	}
 
 	/**
-	 * Attempts to executeUpdate the current statement with given parameters and returns the result as Try instance.
+	 * Attempts to executeUpdate the current statement create given parameters and returns the result as Try instance.
 	 * @param params the parameters
 	 * @return the result
 	 */
@@ -120,7 +120,7 @@ class SQLDriver {
 	}
 
 	/**
-	 * Attempts to executeUpdate the current query statement with given parameters and returns the result as Try instance.
+	 * Attempts to executeUpdate the current query statement create given parameters and returns the result as Try instance.
 	 * @param params the parameters
 	 * @return the result
 	 */
@@ -147,7 +147,7 @@ class SQLDriver {
 	}
 
 	/**
-	 * Returns the result as list with array with objects.
+	 * Returns the result as list create array create objects.
 	 * @return the list
 	 */
 	public List<Object[]> values() {

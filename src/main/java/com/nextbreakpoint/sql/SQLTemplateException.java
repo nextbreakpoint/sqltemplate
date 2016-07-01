@@ -18,7 +18,7 @@ public class SQLTemplateException extends Exception {
 	private static final long serialVersionUID = 1L;
 
 	/**
-	 * Creates a new instance with given message.
+	 * Creates a new instance create given message.
 	 * @param message the message
 	 */
 	public SQLTemplateException(String message) {
@@ -27,7 +27,7 @@ public class SQLTemplateException extends Exception {
 	}
 
 	/**
-	 * Creates a new instance with given message and cause.
+	 * Creates a new instance create given message and cause.
 	 * @param message the message
 	 * @param cause the cause
 	 */

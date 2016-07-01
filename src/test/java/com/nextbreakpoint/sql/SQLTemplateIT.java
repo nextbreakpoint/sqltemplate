@@ -56,40 +56,40 @@ public class SQLTemplateIT {
 	@Test
 	public void shouldReturnSuccess() throws Exception {
 		SQLTemplate template = templateWithValidStatement();
-		Try<List<Object[]>, SQLTemplateException> result = template.run();
+		Try<List<Object[]>, SQLTemplateException> result = template.run(conn);
 		assertFalse(result.isFailure());
 	}
 
 	@Test
 	public void shouldReturnResult() throws Exception {
 		SQLTemplate template = templateWithValidStatement();
-		Try<List<Object[]>, SQLTemplateException> result = template.run();
+		Try<List<Object[]>, SQLTemplateException> result = template.run(conn);
 		assertNotNull(result.get());
 	}
 
 	@Test
 	public void shouldReturnTwoRows() throws Exception {
 		SQLTemplate template = templateWithValidStatement();
-		Try<List<Object[]>, SQLTemplateException> result = template.run();
+		Try<List<Object[]>, SQLTemplateException> result = template.run(conn);
 		assertEquals(2, result.get().size());
 	}
 
 	@Test
 	public void shouldReturnFailureWhenErrorInStatement() throws Exception {
 		SQLTemplate template = templateWithErrorInStatement();
-		Try<List<Object[]>, SQLTemplateException> result = template.run();
+		Try<List<Object[]>, SQLTemplateException> result = template.run(conn);
 		assertTrue(result.isFailure());
 	}
 
 	@Test
 	public void shouldReturnFailureWhenErrorInParameters() throws Exception {
 		SQLTemplate template = templateWithErrorInParameters();
-		Try<List<Object[]>, SQLTemplateException> result = template.run();
+		Try<List<Object[]>, SQLTemplateException> result = template.run(conn);
 		assertTrue(result.isFailure());
 	}
 
 	private SQLTemplate templateWithValidStatement() {
-		return SQLTemplate.builder(conn)
+		return SQLTemplate.builder()
 			.noAutoCommit() 
 			.prepareStatement("CREATE TABLE IF NOT EXISTS TEST(ID INT PRIMARY KEY, NAME VARCHAR(255) DEFAULT '')")
 			.executeUpdate()
@@ -105,7 +105,7 @@ public class SQLTemplateIT {
 	}
  
 	private SQLTemplate templateWithErrorInStatement() {
-		return SQLTemplate.builder(conn)
+		return SQLTemplate.builder()
 			.noAutoCommit() 
 			.prepareStatement("CREAT TABLE IF NOT EXISTS TEST(ID INT PRIMARY KEY, NAME VARCHAR(255) DEFAULT '')")
 			.executeUpdate()
@@ -121,7 +121,7 @@ public class SQLTemplateIT {
 	}
 
 	private SQLTemplate templateWithErrorInParameters() {
-		return SQLTemplate.builder(conn)
+		return SQLTemplate.builder()
 			.noAutoCommit() 
 			.prepareStatement("CREATE TABLE IF NOT EXISTS TEST(ID INT PRIMARY KEY, NAME VARCHAR(255) DEFAULT '')")
 			.executeUpdate()

@@ -38,7 +38,7 @@ class SQLStatement {
 	}
 
 	/**
-	 * Executes statement with given parameters and returns the result as Try instance.
+	 * Executes statement create given parameters and returns the result as Try instance.
 	 * @param params the parameters
 	 * @return the result
 	 */
@@ -52,7 +52,7 @@ class SQLStatement {
 	}
 
 	/**
-	 * Executes query statement with given parameters and returns the result as Try instance.
+	 * Executes query statement create given parameters and returns the result as Try instance.
 	 * @param params the parameters
 	 * @return the result
 	 */

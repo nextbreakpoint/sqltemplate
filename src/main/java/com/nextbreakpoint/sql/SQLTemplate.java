@@ -20,29 +20,26 @@ import java.util.List;
  */
 public class SQLTemplate {
 	private final SQLOperation operation;
-	private final Connection connection;
 
-	SQLTemplate(Connection connection, SQLOperation operation) {
+	SQLTemplate(SQLOperation operation) {
 		Objects.requireNonNull(operation);
-		Objects.requireNonNull(connection);
-		this.connection = connection;
 		this.operation = operation;
 	}
 
 	/**
-	 * Attempts to executeUpdate the operations and returns the result as Try instance.
+	 * Attempts to run the operations and returns the result as Try instance.
+	 * @param connection a JDBC connection
 	 * @return the result
 	 */
-	public Try<List<Object[]>, SQLTemplateException> run() {
+	public Try<List<Object[]>, SQLTemplateException> run(Connection connection) {
 		return operation.apply(SQLDriver.create(connection)).map(driver -> driver.values());
 	}
 
 	/**
-	 * Creates a builder with given connection.
-	 * @param connection the connection
+	 * Creates a builder create given connection.
 	 * @return the builder
 	 */
-	public static SQLBuilder builder(Connection connection) {
-		return SQLBuilder.with(connection);
+	public static SQLBuilder builder() {
+		return SQLBuilder.create();
 	}
 }
