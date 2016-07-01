@@ -29,7 +29,7 @@ public class SQLBuilder {
 	}
 
 	/**
-	 * Creates a new empty command.
+	 * Creates a empty command.
 	 * @return new command
 	 */
 	public static SQLBuilder create() {
@@ -37,7 +37,7 @@ public class SQLBuilder {
 	}
 
 	/**
-	 * Appends autoCommit command.
+	 * Appends set auto commit true.
 	 * @return new command
 	 */
 	public SQLBuilder autoCommit() {
@@ -45,7 +45,7 @@ public class SQLBuilder {
 	}
 
 	/**
-	 * Appends noAutoCommit command.
+	 * Appends set auto commit false.
 	 * @return new command
 	 */
 	public SQLBuilder noAutoCommit() {
@@ -53,7 +53,7 @@ public class SQLBuilder {
 	}
 	
 	/**
-	 * Appends commit command.
+	 * Appends commit.
 	 * @return new command
 	 */
 	public SQLBuilder commit() {
@@ -61,7 +61,7 @@ public class SQLBuilder {
 	}
 	
 	/**
-	 * Appends rollback command.
+	 * Appends rollback.
 	 * @return new command
 	 */
 	public SQLBuilder rollback() {
@@ -69,45 +69,45 @@ public class SQLBuilder {
 	}
 
 	/**
-	 * Appends prepareStatement command.
+	 * Appends prepare statement.
 	 * @param sqlStmt the SQL statement
 	 * @return new command
 	 */
-	public SQLBuilder prepareStatement(String sqlStmt) {
+	public SQLBuilder statement(String sqlStmt) {
 		return create(operation.andThen(driver -> driver.prepareStatement(sqlStmt)));
 	}
 	
 	/**
-	 * Appends executeUpdate create arguments command.
+	 * Appends update with arguments.
 	 * @param params the parameters
 	 * @return new command
 	 */
-	public SQLBuilder executeUpdate(Object[] params) {
+	public SQLBuilder update(Object[] params) {
 		return create(operation.andThen(driver -> driver.executeUpdate(params)));
 	}
 
 	/**
-	 * Appends executeQuery create arguments command.
+	 * Appends query with arguments.
 	 * @param params the parameters
 	 * @return new command
 	 */
-	public SQLBuilder executeQuery(Object[] params) {
+	public SQLBuilder query(Object[] params) {
 		return create(operation.andThen(driver -> driver.executeQuery(params)));
 	}
 
 	/**
-	 * Appends executeUpdate command.
+	 * Appends execute update.
 	 * @return new command
 	 */
-	public SQLBuilder executeUpdate() {
+	public SQLBuilder update() {
 		return create(operation.andThen(driver -> driver.executeUpdate()));
 	}
 
 	/**
-	 * Appends executeQuery command.
+	 * Appends execute query.
 	 * @return new command
 	 */
-	public SQLBuilder executeQuery() {
+	public SQLBuilder query() {
 		return create(operation.andThen(driver -> driver.executeQuery()));
 	}
 

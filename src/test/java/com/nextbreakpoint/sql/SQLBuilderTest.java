@@ -60,7 +60,7 @@ public class SQLBuilderTest {
 	@Test
 	public void shouldCallPrepareStatement() throws SQLException {
 		Connection conn = mock(Connection.class);
-		SQLBuilder.create().prepareStatement("SELECT * FROM TEST").build().apply(conn);
+		SQLBuilder.create().statement("SELECT * FROM TEST").build().apply(conn);
 		verify(conn, times(1)).prepareStatement("SELECT * FROM TEST");
 	}
 
@@ -69,7 +69,7 @@ public class SQLBuilderTest {
 		Connection conn = mock(Connection.class);
 		PreparedStatement stmt = mock(PreparedStatement.class);
 		when(conn.prepareStatement("XXX")).thenReturn(stmt);
-		SQLBuilder.create().prepareStatement("XXX").executeUpdate().build().apply(conn);
+		SQLBuilder.create().statement("XXX").update().build().apply(conn);
 		verify(stmt, times(1)).executeUpdate();
 	}
 
@@ -78,7 +78,7 @@ public class SQLBuilderTest {
 		Connection conn = mock(Connection.class);
 		PreparedStatement stmt = mock(PreparedStatement.class);
 		when(conn.prepareStatement("XXX")).thenReturn(stmt);
-		SQLBuilder.create().prepareStatement("XXX").executeQuery().build().apply(conn);
+		SQLBuilder.create().statement("XXX").query().build().apply(conn);
 		verify(stmt, times(1)).executeQuery();
 	}
 
@@ -87,7 +87,7 @@ public class SQLBuilderTest {
 		Connection conn = mock(Connection.class);
 		PreparedStatement stmt = mock(PreparedStatement.class);
 		when(conn.prepareStatement("XXX")).thenReturn(stmt);
-		SQLBuilder.create().prepareStatement("XXX").executeUpdate(new String[] {"X", "Y"}).build().apply(conn);
+		SQLBuilder.create().statement("XXX").update(new String[] {"X", "Y"}).build().apply(conn);
 		verify(stmt, times(1)).setObject(1, "X");
 		verify(stmt, times(1)).setObject(2, "Y");
 		verify(stmt, times(1)).executeUpdate();
@@ -98,7 +98,7 @@ public class SQLBuilderTest {
 		Connection conn = mock(Connection.class);
 		PreparedStatement stmt = mock(PreparedStatement.class);
 		when(conn.prepareStatement("XXX")).thenReturn(stmt);
-		SQLBuilder.create().prepareStatement("XXX").executeQuery(new String[] {"X", "Y"}).build().apply(conn);
+		SQLBuilder.create().statement("XXX").query(new String[] {"X", "Y"}).build().apply(conn);
 		verify(stmt, times(1)).setObject(1, "X");
 		verify(stmt, times(1)).setObject(2, "Y");
 		verify(stmt, times(1)).executeQuery();

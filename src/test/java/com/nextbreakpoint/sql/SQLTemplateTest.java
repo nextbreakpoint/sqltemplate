@@ -47,7 +47,7 @@ public class SQLTemplateTest {
 		String stmtSql = "select * from test";
 		when(conn.prepareStatement(stmtSql)).thenReturn(stmt);
 		when(stmt.executeUpdate()).thenReturn(10);
-		Try<List<Object[]>, SQLTemplateException> template = SQLTemplate.builder().executeUpdate().build().apply(conn);
+		Try<List<Object[]>, SQLTemplateException> template = SQLTemplate.builder().update().build().apply(conn);
 		assertTrue(template.isFailure());
 		assertFalse(template.isPresent());
 	}
@@ -59,7 +59,7 @@ public class SQLTemplateTest {
 		String stmtSql = "select * from test";
 		when(conn.prepareStatement(stmtSql)).thenReturn(stmt);
 		when(stmt.executeUpdate()).thenReturn(10);
-		Try<List<Object[]>, SQLTemplateException> template = SQLTemplate.builder().executeQuery().build().apply(conn);
+		Try<List<Object[]>, SQLTemplateException> template = SQLTemplate.builder().query().build().apply(conn);
 		assertTrue(template.isFailure());
 		assertFalse(template.isPresent());
 	}
@@ -71,7 +71,7 @@ public class SQLTemplateTest {
 		String stmtSql = "select * from test";
 		when(conn.prepareStatement(stmtSql)).thenReturn(stmt);
 		when(stmt.executeUpdate()).thenReturn(10);
-		Try<List<Object[]>, SQLTemplateException> template = SQLTemplate.builder().prepareStatement(stmtSql).executeUpdate().build().apply(conn);
+		Try<List<Object[]>, SQLTemplateException> template = SQLTemplate.builder().statement(stmtSql).update().build().apply(conn);
 		assertFalse(template.isFailure());
 		assertNotNull(template.get());
 		assertEquals(10L, template.get().get(0)[0]);
@@ -92,7 +92,7 @@ public class SQLTemplateTest {
 		when(rs.getMetaData()).thenReturn(meta);
 		when(rs.getObject(1)).thenReturn(1L);
 		when(rs.getObject(2)).thenReturn("a");
-		Try<List<Object[]>, SQLTemplateException> template = SQLTemplate.builder().prepareStatement(stmtSql).executeQuery().build().apply(conn);
+		Try<List<Object[]>, SQLTemplateException> template = SQLTemplate.builder().statement(stmtSql).query().build().apply(conn);
 		assertFalse(template.isFailure());
 		assertNotNull(template.get());
 		Object[] findFirst = template.get().get(0);
@@ -139,7 +139,7 @@ public class SQLTemplateTest {
 		doThrow(SQLException.class).when(stmt).setObject(any(Integer.class), any(Object.class));
 		String stmtSql = "select * from test where id=?";
 		when(conn.prepareStatement(stmtSql)).thenReturn(stmt);
-		Try<List<Object[]>, SQLTemplateException> template = SQLTemplate.builder().prepareStatement(stmtSql).executeQuery(new String[] { "X" }).build().apply(conn);
+		Try<List<Object[]>, SQLTemplateException> template = SQLTemplate.builder().statement(stmtSql).query(new String[] { "X" }).build().apply(conn);
 		assertTrue(template.isFailure());
 	}
 }

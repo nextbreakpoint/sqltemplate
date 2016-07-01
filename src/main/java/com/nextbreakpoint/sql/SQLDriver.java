@@ -8,7 +8,6 @@ package com.nextbreakpoint.sql;
 
 import com.nextbreakpoint.Try;
 
-import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.List;
 
@@ -84,16 +83,16 @@ class SQLDriver {
 	}
 
 	/**
-	 * Attempts to executeUpdate the current statement create given parameters and returns the result as Try instance.
+	 * Attempts to execute the current update statement with given parameters and returns the result as Try instance.
 	 * @param params the parameters
 	 * @return the result
 	 */
 	public Try<SQLDriver, SQLTemplateException> executeUpdate(Object[] params) {
-		return tryCallable(() -> sqlStatement.execute(params).map(res -> create(conn, sqlStatement, SQLResult.of(res))).getOrThrow());
+		return tryCallable(() -> sqlStatement.executeUpdate(params).map(res -> create(conn, sqlStatement, SQLResult.of(res))).getOrThrow());
 	}
 
 	/**
-	 * Attempts to executeUpdate the current query statement create given parameters and returns the result as Try instance.
+	 * Attempts to execute the current query statement with given parameters and returns the result as Try instance.
 	 * @param params the parameters
 	 * @return the result
 	 */
@@ -102,7 +101,7 @@ class SQLDriver {
 	}
 
 	/**
-	 * Attempts to executeUpdate the current statement and returns the result as Try instance.
+	 * Attempts to execute the current update statement and returns the result as Try instance.
 	 * @return the result
 	 */
 	public Try<SQLDriver, SQLTemplateException> executeUpdate() {
@@ -110,7 +109,7 @@ class SQLDriver {
 	}
 
 	/**
-	 * Attempts to executeUpdate the current query statement and returns the result as Try instance.
+	 * Attempts to execute the current query statement and returns the result as Try instance.
 	 * @return the result
 	 */
 	public Try<SQLDriver, SQLTemplateException> executeQuery() {
@@ -118,7 +117,7 @@ class SQLDriver {
 	}
 
 	/**
-	 * Returns the result as list create array create objects.
+	 * Returns the result as list of arrays of objects.
 	 * @return the list
 	 */
 	public List<Object[]> values() {
@@ -143,7 +142,7 @@ class SQLDriver {
 	}
 
 	/**
-	 * Tries to execute the callable.
+	 * Attempts to execute the callable.
 	 * @param <R> the value type
 	 * @return the result
 	 */
