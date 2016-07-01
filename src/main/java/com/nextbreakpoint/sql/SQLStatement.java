@@ -35,6 +35,7 @@ class SQLStatement {
 		if (st != null) {
 			st.close();
 		}
+		super.finalize();
 	}
 
 	/**
@@ -43,12 +44,7 @@ class SQLStatement {
 	 * @return the result
 	 */
 	public Try<Integer, SQLTemplateException> execute(Object[] params) {
-		try {
-			bindParameters(params);
-			return SQLDriver.success(st.executeUpdate());
-		} catch (Exception e) {
-			return SQLDriver.failure(e);
-		}
+		return SQLDriver.tryCallable(() -> bindParameters(params).executeUpdate());
 	}
 
 	/**
@@ -57,15 +53,11 @@ class SQLStatement {
 	 * @return the result
 	 */
 	public Try<ResultSet, SQLTemplateException> executeQuery(Object[] params) {
-		try {
-			bindParameters(params);
-			return SQLDriver.success(st.executeQuery());
-		} catch (Exception e) {
-			return SQLDriver.failure(e);
-		}
+		return SQLDriver.tryCallable(() -> bindParameters(params).executeQuery());
 	}
 
-	private void bindParameters(Object[] params) throws Exception {
+	private PreparedStatement bindParameters(Object[] params) throws Exception {
 		if (params != null) for (int p = 1; p <= params.length; p++) st.setObject(p, params[p - 1]);
+		return st;
 	}
 }

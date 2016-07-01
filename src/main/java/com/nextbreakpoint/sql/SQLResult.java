@@ -6,6 +6,8 @@
  */
 package com.nextbreakpoint.sql;
 
+import com.nextbreakpoint.Try;
+
 import java.sql.ResultSet;
 import java.sql.ResultSetMetaData;
 import java.util.Objects;
@@ -58,6 +60,7 @@ abstract class SQLResult {
 			if (rs != null) {
 				rs.close();
 			}
+			super.finalize();
 		}
 
 		public Stream<Object[]> stream() {
@@ -66,18 +69,18 @@ abstract class SQLResult {
 
 		private class ResultSpliterator implements Spliterator<Object[]> {
 			@Override
-			public boolean tryAdvance(Consumer<? super Object[]> action) {
-				try {
-					if (rs != null && rs.next()) {
+			public boolean tryAdvance(Consumer<? super Object[]> consumer) {
+				return Try.of(() -> {
+					if (rs.next()) {
 						ResultSetMetaData metadata = rs.getMetaData();
 						Object[] columns = new Object[metadata.getColumnCount()];
 						bindColumns(rs, columns);
-						action.accept(columns);
+						consumer.accept(columns);
 						return true;
+					} else {
+						return false;
 					}
-				} catch (Exception e) {
-				}
-				return false;
+				}).getOrElse(false);
 			}
 
 			private void bindColumns(ResultSet rs, Object[] columns) throws Exception {
@@ -115,9 +118,9 @@ abstract class SQLResult {
 
 		private class ResultSpliterator implements Spliterator<Object[]> {
 			@Override
-			public boolean tryAdvance(Consumer<? super Object[]> action) {
+			public boolean tryAdvance(Consumer<? super Object[]> consumer) {
 				if (!consumed) {
-					action.accept(new Object[] { value });
+					consumer.accept(new Object[] { value });
 					consumed = true;
 					return true;
 				}

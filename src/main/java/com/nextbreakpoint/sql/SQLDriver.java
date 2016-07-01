@@ -25,17 +25,15 @@ import java.util.stream.Stream;
  */
 class SQLDriver {
 	private final Connection conn;
-	private final Optional<SQLResult> sqlResult;
-	private final Optional<SQLStatement> sqlStatement;
+	private final SQLResult sqlResult;
+	private final SQLStatement sqlStatement;
 
 	private SQLDriver(Connection conn) {
-		this(conn, Optional.empty(), Optional.empty());
+		this(conn, null, null);
 	}
 
-	private SQLDriver(Connection conn, Optional<SQLStatement> sqlStatement, Optional<SQLResult> sqlResult) {
+	private SQLDriver(Connection conn, SQLStatement sqlStatement, SQLResult sqlResult) {
 		Objects.requireNonNull(conn);
-		Objects.requireNonNull(sqlResult);
-		Objects.requireNonNull(sqlStatement);
 		this.conn = conn;
 		this.sqlResult = sqlResult;
 		this.sqlStatement = sqlStatement;
@@ -46,13 +44,11 @@ class SQLDriver {
 	 * @return the result
 	 */
 	public Try<SQLDriver, SQLTemplateException> autoCommit() {
-		try {
+		return tryCallable(() -> {
 			conn.setAutoCommit(true);
 			conn.commit();
-			return success(new SQLDriver(conn, sqlStatement, sqlResult));
-		} catch (Exception e) {
-			return failure(e);
-		}
+			return create(conn, sqlStatement, sqlResult);
+		});
 	}
 
 	/**
@@ -60,13 +56,11 @@ class SQLDriver {
 	 * @return the result
 	 */
 	public Try<SQLDriver, SQLTemplateException> noAutoCommit() {
-		try {
+		return tryCallable(() -> {
 			conn.setAutoCommit(false);
 			conn.commit();
-			return success(new SQLDriver(conn, sqlStatement, sqlResult));
-		} catch (Exception e) {
-			return failure(e);
-		}
+			return create(conn, sqlStatement, sqlResult);
+		});
 	}
 
 	/**
@@ -74,12 +68,10 @@ class SQLDriver {
 	 * @return the result
 	 */
 	public Try<SQLDriver, SQLTemplateException> commit() {
-		try {
+		return tryCallable(() -> {
 			conn.commit();
-			return success(new SQLDriver(conn, sqlStatement, sqlResult));
-		} catch (Exception e) {
-			return failure(e);
-		}
+			return create(conn, sqlStatement, sqlResult);
+		});
 	}
 
 	/**
@@ -87,12 +79,10 @@ class SQLDriver {
 	 * @return the result
 	 */
 	public Try<SQLDriver, SQLTemplateException> rollback() {
-		try {
+		return tryCallable(() -> {
 			conn.rollback();
-			return success(new SQLDriver(conn, sqlStatement, sqlResult));
-		} catch (Exception e) {
-			return failure(e);
-		}
+			return create(conn, sqlStatement, sqlResult);
+		});
 	}
 
 	/**
@@ -101,11 +91,9 @@ class SQLDriver {
 	 * @return the result
 	 */
 	public Try<SQLDriver, SQLTemplateException> prepareStatement(String sql) {
-		try {
-			return success(new SQLDriver(conn, Optional.of(new SQLStatement(conn.prepareStatement(sql))), Optional.empty()));
-		} catch (Exception e) {
-			return failure(e);
-		}
+		return tryCallable(() -> {
+			return create(conn, new SQLStatement(conn.prepareStatement(sql)), null);
+		});
 	}
 
 	/**
@@ -114,9 +102,9 @@ class SQLDriver {
 	 * @return the result
 	 */
 	public Try<SQLDriver, SQLTemplateException> executeUpdate(Object[] params) {
-		return sqlStatement.map(st -> st.execute(params))
-				.map(res -> res.flatMap(cnt -> success(new SQLDriver(conn, sqlStatement, Optional.of(SQLResult.of(cnt))))))
-				.orElseGet(() -> failure(new SQLTemplateException("statement not found")));
+		return Optional.ofNullable(sqlStatement).map(st -> st.execute(params))
+			.map(res -> res.flatMap(cnt -> success(create(conn, sqlStatement, SQLResult.of(cnt)))))
+			.orElseGet(() -> failure(new SQLTemplateException("statement not found")));
 	}
 
 	/**
@@ -125,9 +113,9 @@ class SQLDriver {
 	 * @return the result
 	 */
 	public Try<SQLDriver, SQLTemplateException> executeQuery(Object[] params) {
-		return sqlStatement.map(st -> st.executeQuery(params))
-				.map(res -> res.flatMap(set -> success(new SQLDriver(conn, sqlStatement, Optional.of(SQLResult.of(set))))))
-				.orElseGet(() -> failure(new SQLTemplateException("statement not found")));
+		return Optional.ofNullable(sqlStatement).map(st -> st.executeQuery(params))
+			.map(res -> res.flatMap(set -> success(create(conn, sqlStatement, SQLResult.of(set)))))
+			.orElseGet(() -> failure(new SQLTemplateException("statement not found")));
 	}
 
 	/**
@@ -154,10 +142,6 @@ class SQLDriver {
 		return stream().collect(Collectors.toList());
 	}
 
-	private Stream<Object[]> stream() {
-		return sqlResult.map(s -> s.stream()).orElse(Stream.empty());
-	}
-
 	/**
 	 * Creates a new instance from given connection.
 	 * @param conn the connection
@@ -175,15 +159,28 @@ class SQLDriver {
 		return Try.failure(defaultMapper(), defaultMapper().apply(exception));
 	}
 
-	static <T> Try<T, SQLTemplateException> of(Callable<T> callable) {
-		return Try.of(defaultMapper(), callable);
-	}
-
 	/**
 	 * Returns default mapper function. 
 	 * @return the mapper
 	 */
 	public static Function<Throwable, SQLTemplateException> defaultMapper() {
 		return e -> (e instanceof SQLTemplateException) ? (SQLTemplateException)e : new SQLTemplateException("SQL template error", e);
+	}
+
+	private static SQLDriver create(Connection conn, SQLStatement sqlStatement, SQLResult sqlResult) {
+		return new SQLDriver(conn, sqlStatement, sqlResult);
+	}
+
+	private Stream<Object[]> stream() {
+		return Optional.ofNullable(sqlResult).map(s -> s.stream()).orElse(Stream.empty());
+	}
+
+	/**
+	 * Tries to execute the callable.
+	 * @param <R> the value type
+	 * @return the result
+	 */
+	public static <R> Try<R, SQLTemplateException> tryCallable(Callable<R> callable) {
+		return Try.of(defaultMapper(), callable);
 	}
 }
