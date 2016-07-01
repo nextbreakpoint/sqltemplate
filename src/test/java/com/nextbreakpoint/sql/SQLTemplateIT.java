@@ -56,35 +56,35 @@ public class SQLTemplateIT {
 	@Test
 	public void shouldReturnSuccess() throws Exception {
 		SQLTemplate template = templateWithValidStatement();
-		Try<List<Object[]>, SQLTemplateException> result = template.run(conn);
+		Try<List<Object[]>, SQLTemplateException> result = template.apply(conn);
 		assertFalse(result.isFailure());
 	}
 
 	@Test
 	public void shouldReturnResult() throws Exception {
 		SQLTemplate template = templateWithValidStatement();
-		Try<List<Object[]>, SQLTemplateException> result = template.run(conn);
+		Try<List<Object[]>, SQLTemplateException> result = template.apply(conn);
 		assertNotNull(result.get());
 	}
 
 	@Test
 	public void shouldReturnTwoRows() throws Exception {
 		SQLTemplate template = templateWithValidStatement();
-		Try<List<Object[]>, SQLTemplateException> result = template.run(conn);
+		Try<List<Object[]>, SQLTemplateException> result = template.apply(conn);
 		assertEquals(2, result.get().size());
 	}
 
 	@Test
 	public void shouldReturnFailureWhenErrorInStatement() throws Exception {
 		SQLTemplate template = templateWithErrorInStatement();
-		Try<List<Object[]>, SQLTemplateException> result = template.run(conn);
+		Try<List<Object[]>, SQLTemplateException> result = template.apply(conn);
 		assertTrue(result.isFailure());
 	}
 
 	@Test
 	public void shouldReturnFailureWhenErrorInParameters() throws Exception {
 		SQLTemplate template = templateWithErrorInParameters();
-		Try<List<Object[]>, SQLTemplateException> result = template.run(conn);
+		Try<List<Object[]>, SQLTemplateException> result = template.apply(conn);
 		assertTrue(result.isFailure());
 	}
 

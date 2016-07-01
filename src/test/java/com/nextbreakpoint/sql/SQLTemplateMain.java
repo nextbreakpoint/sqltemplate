@@ -38,7 +38,7 @@ public class SQLTemplateMain {
 				.prepareStatement("SELECT * FROM TEST")
 				.executeQuery()
 				.build()
-				.run(conn)
+				.apply(conn)
 				.get().stream().map(columns -> columns[1]).forEach(System.out::println);
 		} finally {
 		}

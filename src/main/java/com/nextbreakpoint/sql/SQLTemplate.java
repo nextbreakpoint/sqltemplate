@@ -27,11 +27,11 @@ public class SQLTemplate {
 	}
 
 	/**
-	 * Attempts to run the operations and returns the result as Try instance.
+	 * Attempts to apply the operations and returns the result as Try instance.
 	 * @param connection a JDBC connection
 	 * @return the result
 	 */
-	public Try<List<Object[]>, SQLTemplateException> run(Connection connection) {
+	public Try<List<Object[]>, SQLTemplateException> apply(Connection connection) {
 		return operation.apply(SQLDriver.create(connection)).map(driver -> driver.values());
 	}
 

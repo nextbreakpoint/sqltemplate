@@ -1,6 +1,6 @@
 # SQLTemplate 1.3.0
 
-SQLTemplate implements a functional API for executing SQL statements
+SQLTemplate implements a fluent API for executing SQL statements
 
 ## Example
 
@@ -35,7 +35,7 @@ Given the program:
                     .prepareStatement("SELECT * FROM TEST")
                     .executeQuery()
                     .build()
-                    .run(conn)
+                    .apply(conn)
                     .get().stream().map(columns -> columns[1]).forEach(System.out::println);
             } finally {
             }
