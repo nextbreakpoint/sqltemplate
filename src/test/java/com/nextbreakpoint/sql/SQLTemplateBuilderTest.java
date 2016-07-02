@@ -6,11 +6,6 @@
  */
 package com.nextbreakpoint.sql;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertTrue;
-import static org.mockito.Mockito.*;
-
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.ExpectedException;
@@ -19,48 +14,51 @@ import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.SQLException;
 
-public class SQLBuilderTest {
+import static org.junit.Assert.assertNotNull;
+import static org.mockito.Mockito.*;
+
+public class SQLTemplateBuilderTest {
 	@Rule
 	public ExpectedException exception = ExpectedException.none();
 	
 	@Test
 	public void shouldReturnNotNull() {
 		Connection conn = mock(Connection.class);
-		assertNotNull(SQLBuilder.create().build());
+		assertNotNull(SQLTemplateBuilder.create().build());
 	}
 
 	@Test
 	public void shouldCallSetAutoCommitWithTrue() throws SQLException {
 		Connection conn = mock(Connection.class);
-		SQLBuilder.create().autoCommit().build().apply(conn);
+		SQLTemplateBuilder.create().autoCommit().build().apply(conn);
 		verify(conn, times(1)).setAutoCommit(true);
 	}
 
 	@Test
 	public void shouldCallSetAutoCommitWithFalse() throws SQLException {
 		Connection conn = mock(Connection.class);
-		SQLBuilder.create().noAutoCommit().build().apply(conn);
+		SQLTemplateBuilder.create().noAutoCommit().build().apply(conn);
 		verify(conn, times(1)).setAutoCommit(false);
 	}
 
 	@Test
 	public void shouldCallCommit() throws SQLException {
 		Connection conn = mock(Connection.class);
-		SQLBuilder.create().commit().build().apply(conn);
+		SQLTemplateBuilder.create().commit().build().apply(conn);
 		verify(conn, times(1)).commit();
 	}
 
 	@Test
 	public void shouldCallRollback() throws SQLException {
 		Connection conn = mock(Connection.class);
-		SQLBuilder.create().rollback().build().apply(conn);
+		SQLTemplateBuilder.create().rollback().build().apply(conn);
 		verify(conn, times(1)).rollback();
 	}
 
 	@Test
 	public void shouldCallPrepareStatement() throws SQLException {
 		Connection conn = mock(Connection.class);
-		SQLBuilder.create().statement("SELECT * FROM TEST").build().apply(conn);
+		SQLTemplateBuilder.create().statement("SELECT * FROM TEST").build().apply(conn);
 		verify(conn, times(1)).prepareStatement("SELECT * FROM TEST");
 	}
 
@@ -69,7 +67,7 @@ public class SQLBuilderTest {
 		Connection conn = mock(Connection.class);
 		PreparedStatement stmt = mock(PreparedStatement.class);
 		when(conn.prepareStatement("XXX")).thenReturn(stmt);
-		SQLBuilder.create().statement("XXX").update().build().apply(conn);
+		SQLTemplateBuilder.create().statement("XXX").update().build().apply(conn);
 		verify(stmt, times(1)).executeUpdate();
 	}
 
@@ -78,7 +76,7 @@ public class SQLBuilderTest {
 		Connection conn = mock(Connection.class);
 		PreparedStatement stmt = mock(PreparedStatement.class);
 		when(conn.prepareStatement("XXX")).thenReturn(stmt);
-		SQLBuilder.create().statement("XXX").query().build().apply(conn);
+		SQLTemplateBuilder.create().statement("XXX").query().build().apply(conn);
 		verify(stmt, times(1)).executeQuery();
 	}
 
@@ -87,7 +85,7 @@ public class SQLBuilderTest {
 		Connection conn = mock(Connection.class);
 		PreparedStatement stmt = mock(PreparedStatement.class);
 		when(conn.prepareStatement("XXX")).thenReturn(stmt);
-		SQLBuilder.create().statement("XXX").update(new String[] {"X", "Y"}).build().apply(conn);
+		SQLTemplateBuilder.create().statement("XXX").update(new String[] {"X", "Y"}).build().apply(conn);
 		verify(stmt, times(1)).setObject(1, "X");
 		verify(stmt, times(1)).setObject(2, "Y");
 		verify(stmt, times(1)).executeUpdate();
@@ -98,7 +96,7 @@ public class SQLBuilderTest {
 		Connection conn = mock(Connection.class);
 		PreparedStatement stmt = mock(PreparedStatement.class);
 		when(conn.prepareStatement("XXX")).thenReturn(stmt);
-		SQLBuilder.create().statement("XXX").query(new String[] {"X", "Y"}).build().apply(conn);
+		SQLTemplateBuilder.create().statement("XXX").query(new String[] {"X", "Y"}).build().apply(conn);
 		verify(stmt, times(1)).setObject(1, "X");
 		verify(stmt, times(1)).setObject(2, "Y");
 		verify(stmt, times(1)).executeQuery();

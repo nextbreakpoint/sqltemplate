@@ -6,19 +6,14 @@
  */
 package com.nextbreakpoint.sql;
 
+import com.nextbreakpoint.Try;
+import org.junit.*;
+import org.junit.rules.ExpectedException;
+
 import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.SQLException;
 import java.util.List;
-
-import org.junit.After;
-import org.junit.Before;
-import org.junit.BeforeClass;
-import org.junit.Rule;
-import org.junit.Test;
-import org.junit.rules.ExpectedException;
-
-import com.nextbreakpoint.Try;
 
 import static org.junit.Assert.*;
 

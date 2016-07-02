@@ -6,23 +6,18 @@
  */
 package com.nextbreakpoint.sql;
 
+import com.nextbreakpoint.Try;
+
 import java.sql.Connection;
 import java.sql.DriverManager;
+import java.sql.SQLException;
+import java.util.function.Consumer;
 
 public class SQLTemplateMain {
-	public static void main(String[] args) {
-		try {
-			Class.forName("org.h2.Driver");
-			run();
-		} catch (Exception e) {
-			e.printStackTrace();
-		}
-	}
-
-	private static void run() throws Exception {
-		try (Connection conn = DriverManager.getConnection("jdbc:h2:~/test", "sa", "")) {
+	private static Object run() throws Exception {
+		execute(conn -> {
 			SQLTemplate.builder()
-				.noAutoCommit() 
+				.noAutoCommit()
 				.statement("CREATE TABLE IF NOT EXISTS TEST(ID INT PRIMARY KEY, NAME VARCHAR(255) DEFAULT '')")
 				.update()
 				.statement("DELETE TEST")
@@ -39,7 +34,27 @@ public class SQLTemplateMain {
 				.query()
 				.build()
 				.apply(conn).get().stream().map(columns -> columns[1]).forEach(System.out::println);
-		} finally {
-		}
+		});
+		return null;
+	}
+
+	private static void execute(Consumer<Connection> consumer) throws SQLException {
+		try (Connection conn = getConnection()) { consumer.accept(conn); } finally {}
+	}
+
+	private static Connection getConnection() throws SQLException {
+		return DriverManager.getConnection("jdbc:h2:~/test", "sa", "");
+	}
+
+	private static Class<?> loadDriver() throws ClassNotFoundException {
+		return Class.forName("org.h2.Driver");
+	}
+
+	private static Consumer<Throwable> exceptionHandler() {
+		return e -> e.printStackTrace();
+	}
+
+	public static void main(String[] args) {
+		Try.of(SQLTemplateMain::loadDriver).flatMap(res -> Try.of(SQLTemplateMain::run)).onFailure(exceptionHandler());
 	}
 }

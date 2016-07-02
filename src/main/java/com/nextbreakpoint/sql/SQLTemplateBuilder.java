@@ -6,9 +6,9 @@
  */
 package com.nextbreakpoint.sql;
 
-import java.util.Objects;
-
 import com.nextbreakpoint.Try;
+
+import java.util.Objects;
 
 /**
  * Provides a builder for creating a SQLTemplate.
@@ -16,31 +16,31 @@ import com.nextbreakpoint.Try;
  * @author Andrea
  *
  */
-public class SQLBuilder {
+public class SQLTemplateBuilder {
 	private final SQLOperation operation;
 
-	private SQLBuilder(SQLOperation operation) {
+	private SQLTemplateBuilder(SQLOperation operation) {
 		Objects.requireNonNull(operation);
 		this.operation = operation;
 	}
 
-	private static SQLBuilder create(SQLOperation operation) {
-		return new SQLBuilder(operation);
+	private static SQLTemplateBuilder create(SQLOperation operation) {
+		return new SQLTemplateBuilder(operation);
 	}
 
 	/**
 	 * Creates a empty command.
 	 * @return new command
 	 */
-	public static SQLBuilder create() {
-		return create(sql -> Try.success(SQLDriver.defaultMapper(), sql));
+	public static SQLTemplateBuilder create() {
+		return create(sql -> Try.success(SQLTemplateDriver.defaultMapper(), sql));
 	}
 
 	/**
 	 * Appends set auto commit true.
 	 * @return new command
 	 */
-	public SQLBuilder autoCommit() {
+	public SQLTemplateBuilder autoCommit() {
 		return create(operation.andThen(driver -> driver.autoCommit()));
 	}
 
@@ -48,7 +48,7 @@ public class SQLBuilder {
 	 * Appends set auto commit false.
 	 * @return new command
 	 */
-	public SQLBuilder noAutoCommit() {
+	public SQLTemplateBuilder noAutoCommit() {
 		return create(operation.andThen(driver -> driver.noAutoCommit()));
 	}
 	
@@ -56,7 +56,7 @@ public class SQLBuilder {
 	 * Appends commit.
 	 * @return new command
 	 */
-	public SQLBuilder commit() {
+	public SQLTemplateBuilder commit() {
 		return create(operation.andThen(driver -> driver.commit()));
 	}
 	
@@ -64,7 +64,7 @@ public class SQLBuilder {
 	 * Appends rollback.
 	 * @return new command
 	 */
-	public SQLBuilder rollback() {
+	public SQLTemplateBuilder rollback() {
 		return create(operation.andThen(driver -> driver.rollback()));
 	}
 
@@ -73,7 +73,7 @@ public class SQLBuilder {
 	 * @param sqlStmt the SQL statement
 	 * @return new command
 	 */
-	public SQLBuilder statement(String sqlStmt) {
+	public SQLTemplateBuilder statement(String sqlStmt) {
 		return create(operation.andThen(driver -> driver.prepareStatement(sqlStmt)));
 	}
 	
@@ -82,7 +82,7 @@ public class SQLBuilder {
 	 * @param params the parameters
 	 * @return new command
 	 */
-	public SQLBuilder update(Object[] params) {
+	public SQLTemplateBuilder update(Object[] params) {
 		return create(operation.andThen(driver -> driver.executeUpdate(params)));
 	}
 
@@ -91,7 +91,7 @@ public class SQLBuilder {
 	 * @param params the parameters
 	 * @return new command
 	 */
-	public SQLBuilder query(Object[] params) {
+	public SQLTemplateBuilder query(Object[] params) {
 		return create(operation.andThen(driver -> driver.executeQuery(params)));
 	}
 
@@ -99,7 +99,7 @@ public class SQLBuilder {
 	 * Appends execute update.
 	 * @return new command
 	 */
-	public SQLBuilder update() {
+	public SQLTemplateBuilder update() {
 		return create(operation.andThen(driver -> driver.executeUpdate()));
 	}
 
@@ -107,7 +107,7 @@ public class SQLBuilder {
 	 * Appends execute query.
 	 * @return new command
 	 */
-	public SQLBuilder query() {
+	public SQLTemplateBuilder query() {
 		return create(operation.andThen(driver -> driver.executeQuery()));
 	}
 

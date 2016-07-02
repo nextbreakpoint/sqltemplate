@@ -6,11 +6,11 @@
  */
 package com.nextbreakpoint.sql;
 
-import java.sql.Connection;
-import java.util.Objects;
-
 import com.nextbreakpoint.Try;
+
+import java.sql.Connection;
 import java.util.List;
+import java.util.Objects;
 
 /**
  * SQLTemplate implements a functional API for executing SQL statements.
@@ -32,14 +32,14 @@ public class SQLTemplate {
 	 * @return the result
 	 */
 	public Try<List<Object[]>, SQLTemplateException> apply(Connection connection) {
-		return operation.apply(SQLDriver.create(connection)).map(driver -> driver.values());
+		return operation.apply(SQLTemplateDriver.create(connection)).map(driver -> driver.values());
 	}
 
 	/**
 	 * Creates a builder create given connection.
 	 * @return the builder
 	 */
-	public static SQLBuilder builder() {
-		return SQLBuilder.create();
+	public static SQLTemplateBuilder builder() {
+		return SQLTemplateBuilder.create();
 	}
 }
