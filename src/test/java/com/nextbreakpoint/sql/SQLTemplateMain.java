@@ -15,7 +15,7 @@ import java.util.function.Consumer;
 
 public class SQLTemplateMain {
 	private static Object run() throws Exception {
-		execute(conn -> {
+		execute(connection -> {
 			SQLTemplate.builder()
 				.noAutoCommit()
 				.statement("CREATE TABLE IF NOT EXISTS TEST(ID INT PRIMARY KEY, NAME VARCHAR(255) DEFAULT '')")
@@ -33,13 +33,13 @@ public class SQLTemplateMain {
 				.statement("SELECT * FROM TEST")
 				.query()
 				.build()
-				.apply(conn).get().stream().map(columns -> columns[1]).forEach(System.out::println);
+				.apply(connection).get().stream().map(columns -> columns[1]).forEach(System.out::println);
 		});
 		return null;
 	}
 
 	private static void execute(Consumer<Connection> consumer) throws SQLException {
-		try (Connection conn = getConnection()) { consumer.accept(conn); } finally {}
+		try (Connection connection = getConnection()) { consumer.accept(connection); } finally {}
 	}
 
 	private static Connection getConnection() throws SQLException {
@@ -55,6 +55,6 @@ public class SQLTemplateMain {
 	}
 
 	public static void main(String[] args) {
-		Try.of(SQLTemplateMain::loadDriver).flatMap(res -> Try.of(SQLTemplateMain::run)).onFailure(exceptionHandler());
+		Try.of(SQLTemplateMain::loadDriver).flatMap(clazz -> Try.of(SQLTemplateMain::run)).onFailure(exceptionHandler());
 	}
 }
