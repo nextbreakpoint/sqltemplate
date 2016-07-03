@@ -11,7 +11,7 @@ import java.util.Objects;
 /**
  * Exception which encapsulates SQL errors.
  * 
- * @author Andrea
+ * @author Andrea Medeghini
  *
  */
 public class SQLTemplateException extends Exception {

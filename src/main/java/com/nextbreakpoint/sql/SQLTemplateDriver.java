@@ -23,7 +23,7 @@ import java.util.stream.StreamSupport;
 /**
  * Provides a driver for executing JDBC operations.
  * 
- * @author Andrea
+ * @author Andrea Medeghini
  *
  */
 public class SQLTemplateDriver {
@@ -118,6 +118,14 @@ public class SQLTemplateDriver {
 	}
 
 	/**
+	 * Attempts to fetch data from current result set and returns the result as Try instance.
+	 * @return the result
+	 */
+	public Try<SQLTemplateDriver, SQLTemplateException> fetch() {
+		return tryCallable(() -> create(conn, sqlStatement, SQLResult.of(values())));
+	}
+
+	/**
 	 * Returns the result as list of arrays of objects.
 	 * @return the list
 	 */
@@ -208,12 +216,30 @@ public class SQLTemplateDriver {
 	private static abstract class SQLResult {
 		public abstract Stream<Object[]> stream();
 
+		public static SQLResult of(List<Object[]> list) {
+			return new SQLResult.SQLResultList(list);
+		}
+
 		public static SQLResult of(ResultSet rs) {
 			return new SQLResult.SQLResultQuery(rs);
 		}
 
 		public static SQLResult of(Integer result) {
 			return new SQLResult.SQLResultUpdate(result);
+		}
+
+		private static class SQLResultList extends SQLResult {
+			private final List<Object[]> list;
+
+			public SQLResultList(List<Object[]> list) {
+				Objects.requireNonNull(list);
+				this.list = list;
+			}
+
+			@Override
+			public Stream<Object[]> stream() {
+				return list.stream();
+			}
 		}
 
 		private static class SQLResultQuery extends SQLResult {

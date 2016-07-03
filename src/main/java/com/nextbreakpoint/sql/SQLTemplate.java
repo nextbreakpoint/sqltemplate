@@ -13,9 +13,9 @@ import java.util.List;
 import java.util.Objects;
 
 /**
- * SQLTemplate implements a functional API for executing SQL statements.
+ * SQLTemplate implements a fluent API for executing SQL statements.
  * 
- * @author Andrea
+ * @author Andrea Medeghini
  *
  */
 public class SQLTemplate {
@@ -32,7 +32,7 @@ public class SQLTemplate {
 	 * @return the result
 	 */
 	public Try<List<Object[]>, SQLTemplateException> apply(Connection connection) {
-		return operation.apply(SQLTemplateDriver.create(connection)).map(driver -> driver.values());
+		return operation.apply(SQLTemplateDriver.create(connection)).flatMap(SQLTemplateDriver::fetch).map(SQLTemplateDriver::values);
 	}
 
 	/**

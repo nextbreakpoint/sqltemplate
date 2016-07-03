@@ -13,7 +13,7 @@ import java.util.Objects;
 /**
  * Provides a builder for creating a SQLTemplate.
  * 
- * @author Andrea
+ * @author Andrea Medeghini
  *
  */
 public class SQLTemplateBuilder {
