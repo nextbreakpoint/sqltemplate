@@ -23,7 +23,7 @@ public class SQLTemplateMain {
 	private static SQLTemplate template() {
 		return SQLTemplate.builder()
             .noAutoCommit()
-            .statement("CREATE TABLE IF NOT EXISTS TEST(ID INT PRIMARY KEY, NAME VARCHAR(255) DEFAULT '')")
+            .statement("CREATE TABLE IF NOT EXISTS TEST(ID INT PRIMARY KEY, NAME VARCHAR(255))")
             .update()
             .statement("DELETE TEST")
             .update()

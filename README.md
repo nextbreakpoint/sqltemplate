@@ -10,11 +10,14 @@ Statements are represented as a chain of operations which are applied to a JDBC 
 
 Tipical use cases are creating tables, inserting data or quering data:
 
-    SQLTemplate.builder().autoCommit().statement("CREATE TABLE TEST(ID INT PRIMARY KEY, NAME VARCHAR(255) DEFAULT '')").update().build().apply(connection);
+    SQLTemplate.builder().autoCommit().statement("CREATE TABLE TEST(ID INT PRIMARY KEY, NAME VARCHAR(255) DEFAULT '')")
+        .update().build().apply(connection);
     
-    SQLTemplate.builder().autoCommit().statement("INSERT INTO TEST (ID, NAME) VALUES (?, ?)").update(new Object[] { 1, "A" }).build().apply(connection);
+    SQLTemplate.builder().autoCommit().statement("INSERT INTO TEST (ID, NAME) VALUES (?, ?)")
+        .update(new Object[] { 1, "A" }).build().apply(connection);
 
-    SQLTemplate.builder().autoCommit().statement("SELECT NAME FROM TEST").query().build().apply(connection).get().stream().forEach(System.out::println));
+    SQLTemplate.builder().autoCommit().statement("SELECT NAME FROM TEST")
+        .query().build().apply(connection).get().stream().forEach(System.out::println));
 
 ## Other examples
 
@@ -30,7 +33,7 @@ Given the program:
         private static SQLTemplate template() {
             return SQLTemplate.builder()
                 .noAutoCommit()
-                .statement("CREATE TABLE IF NOT EXISTS TEST(ID INT PRIMARY KEY, NAME VARCHAR(255) DEFAULT '')")
+                .statement("CREATE TABLE IF NOT EXISTS TEST(ID INT PRIMARY KEY, NAME VARCHAR(255))")
                 .update()
                 .statement("DELETE TEST")
                 .update()
