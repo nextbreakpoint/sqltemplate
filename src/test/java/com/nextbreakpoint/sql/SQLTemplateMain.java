@@ -15,27 +15,29 @@ import java.util.function.Consumer;
 
 public class SQLTemplateMain {
 	private static Object run() throws Exception {
-		execute(connection -> {
-			SQLTemplate.builder()
-				.noAutoCommit()
-				.statement("CREATE TABLE IF NOT EXISTS TEST(ID INT PRIMARY KEY, NAME VARCHAR(255) DEFAULT '')")
-				.update()
-				.statement("DELETE TEST")
-				.update()
-				.commit()
-				.statement("INSERT INTO TEST (ID, NAME) VALUES (?, ?)")
-				.update(new Object[] { 1, "A" })
-				.update(new Object[] { 2, "B" })
-				.commit()
-				.update(new Object[] { 3, "C" })
-				.update(new Object[] { 4, "D" })
-				.rollback()
-				.statement("SELECT * FROM TEST")
-				.query()
-				.build()
-				.apply(connection).get().stream().map(columns -> columns[1]).forEach(System.out::println);
-		});
+		execute(connection -> template().apply(connection).get()
+			.stream().map(columns -> columns[1]).forEach(System.out::println));
 		return null;
+	}
+
+	private static SQLTemplate template() {
+		return SQLTemplate.builder()
+            .noAutoCommit()
+            .statement("CREATE TABLE IF NOT EXISTS TEST(ID INT PRIMARY KEY, NAME VARCHAR(255) DEFAULT '')")
+            .update()
+            .statement("DELETE TEST")
+            .update()
+            .commit()
+            .statement("INSERT INTO TEST (ID, NAME) VALUES (?, ?)")
+            .update(new Object[] { 1, "A" })
+            .update(new Object[] { 2, "B" })
+            .commit()
+            .update(new Object[] { 3, "C" })
+            .update(new Object[] { 4, "D" })
+            .rollback()
+            .statement("SELECT * FROM TEST")
+            .query()
+            .build();
 	}
 
 	private static void execute(Consumer<Connection> consumer) throws SQLException {
