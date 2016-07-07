@@ -1,4 +1,4 @@
-# SQLTemplate 1.3.1
+# SQLTemplate 1.3.2
 
 SQLTemplate implements a fluent API for executing SQL statements
 
