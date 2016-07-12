@@ -146,7 +146,7 @@ public class SQLTemplateDriver {
 	 * Returns default mapper function. 
 	 * @return the mapper
 	 */
-	public static Function<Throwable, SQLTemplateException> defaultMapper() {
+	public static Function<Exception, SQLTemplateException> defaultMapper() {
 		return e -> (e instanceof SQLTemplateException) ? (SQLTemplateException)e : new SQLTemplateException("SQL template error", e);
 	}
 
@@ -157,7 +157,7 @@ public class SQLTemplateDriver {
 	 * @return the result
 	 */
 	public static <R> Try<R, SQLTemplateException> tryCallable(Callable<R> callable) {
-		return Try.of(defaultMapper(), callable);
+		return Try.of(callable).mapper(defaultMapper());
 	}
 
 	private static SQLTemplateDriver create(Connection conn, SQLStatement sqlStatement, SQLResult sqlResult) {

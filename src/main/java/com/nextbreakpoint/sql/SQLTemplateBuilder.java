@@ -33,7 +33,7 @@ public class SQLTemplateBuilder {
 	 * @return new command
 	 */
 	public static SQLTemplateBuilder create() {
-		return create(sql -> Try.success(SQLTemplateDriver.defaultMapper(), sql));
+		return create(sql -> Try.success(sql).mapper(SQLTemplateDriver.defaultMapper()));
 	}
 
 	/**

@@ -80,10 +80,8 @@ public class SQLTemplateTest {
 		when(rs.getMetaData()).thenReturn(meta);
 		when(rs.getObject(1)).thenReturn(1L);
 		when(rs.getObject(2)).thenReturn("a");
-		Try<List<Object[]>, SQLTemplateException> template = SQLTemplate.builder().statement(stmtSql).query().build().apply(conn);
-		assertFalse(template.isFailure());
-		assertNotNull(template.get());
-		Object[] findFirst = template.get().get(0);
+		List<Object[]> result = SQLTemplate.builder().statement(stmtSql).query().build().apply(conn).get();
+		Object[] findFirst = result.get(0);
 		assertEquals(1L, findFirst[0]);
 		assertEquals("a", findFirst[1]);
 	}

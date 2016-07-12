@@ -12,6 +12,7 @@ import org.junit.rules.ExpectedException;
 
 import java.sql.Connection;
 import java.sql.PreparedStatement;
+import java.sql.ResultSet;
 
 import static org.junit.Assert.assertNotNull;
 import static org.mockito.Mockito.*;
@@ -35,22 +36,24 @@ public class SQLTemplateDriverTest {
 	@Test
 	public void shouldCallSetAutoCommitWithFalse() throws Exception {
 		Connection conn = mock(Connection.class);
-		SQLTemplateDriver.create(conn).noAutoCommit();
+		SQLTemplateDriver.create(conn).noAutoCommit().get();
 		verify(conn, times(1)).setAutoCommit(false);
 	}
 
 	@Test
 	public void shouldCallSetAutoCommitWithTrue() throws Exception {
 		Connection conn = mock(Connection.class);
-		SQLTemplateDriver.create(conn).autoCommit();
+		SQLTemplateDriver.create(conn).autoCommit().get();
 		verify(conn, times(1)).setAutoCommit(true);
 	}
 
 	@Test
 	public void shouldCallPrepareStatement() throws Exception {
 		Connection conn = mock(Connection.class);
+		PreparedStatement stmt = mock(PreparedStatement.class);
 		String stmtSql = "select * from test";
-		SQLTemplateDriver.create(conn).prepareStatement(stmtSql);
+		when(conn.prepareStatement(stmtSql)).thenReturn(stmt);
+		SQLTemplateDriver.create(conn).prepareStatement(stmtSql).get();
 		verify(conn, times(1)).prepareStatement(stmtSql);
 	}
 
@@ -60,7 +63,7 @@ public class SQLTemplateDriverTest {
 		PreparedStatement stmt = mock(PreparedStatement.class);
 		String stmtSql = "delete from test";
 		when(conn.prepareStatement(stmtSql)).thenReturn(stmt);
-		SQLTemplateDriver.create(conn).prepareStatement(stmtSql).get().executeUpdate();
+		SQLTemplateDriver.create(conn).prepareStatement(stmtSql).get().executeUpdate().get();
 		verify(stmt, times(1)).executeUpdate();
 	}
 
@@ -68,9 +71,11 @@ public class SQLTemplateDriverTest {
 	public void shouldCallExecuteQuery() throws Exception {
 		Connection conn = mock(Connection.class);
 		PreparedStatement stmt = mock(PreparedStatement.class);
+		ResultSet rs = mock(ResultSet.class);
 		String stmtSql = "select * from test";
 		when(conn.prepareStatement(stmtSql)).thenReturn(stmt);
-		SQLTemplateDriver.create(conn).prepareStatement(stmtSql).get().executeQuery();
+		when(stmt.executeQuery()).thenReturn(rs);
+		SQLTemplateDriver.create(conn).prepareStatement(stmtSql).get().executeQuery().get();
 		verify(stmt, times(1)).executeQuery();
 	}
 
@@ -80,7 +85,7 @@ public class SQLTemplateDriverTest {
 		PreparedStatement stmt = mock(PreparedStatement.class);
 		String stmtSql = "delete from test";
 		when(conn.prepareStatement(stmtSql)).thenReturn(stmt);
-		SQLTemplateDriver.create(conn).prepareStatement(stmtSql).get().executeUpdate(new Object[] { 1L });
+		SQLTemplateDriver.create(conn).prepareStatement(stmtSql).get().executeUpdate(new Object[] { 1L }).get();
 		verify(stmt, times(1)).setObject(1, 1L);
 		verify(stmt, times(1)).executeUpdate();
 	}
@@ -89,9 +94,11 @@ public class SQLTemplateDriverTest {
 	public void shouldCallExecuteQueryWithArguments() throws Exception {
 		Connection conn = mock(Connection.class);
 		PreparedStatement stmt = mock(PreparedStatement.class);
+		ResultSet rs = mock(ResultSet.class);
 		String stmtSql = "select * from test";
 		when(conn.prepareStatement(stmtSql)).thenReturn(stmt);
-		SQLTemplateDriver.create(conn).prepareStatement(stmtSql).get().executeQuery(new Object[] { 1L });
+		when(stmt.executeQuery()).thenReturn(rs);
+		SQLTemplateDriver.create(conn).prepareStatement(stmtSql).get().executeQuery(new Object[] { 1L }).get();
 		verify(stmt, times(1)).setObject(1, 1L);
 		verify(stmt, times(1)).executeQuery();
 	}
@@ -103,7 +110,7 @@ public class SQLTemplateDriverTest {
 		String stmtSql = "select * from test";
 		when(conn.prepareStatement(stmtSql)).thenReturn(stmt);
 		when(stmt.executeUpdate()).thenReturn(1);
-		SQLTemplateDriver.create(conn).prepareStatement(stmtSql).get().executeUpdate().get().commit();
+		SQLTemplateDriver.create(conn).prepareStatement(stmtSql).get().executeUpdate().get().commit().get();
 		verify(conn, times(1)).commit();
 	}
 
@@ -114,7 +121,7 @@ public class SQLTemplateDriverTest {
 		String stmtSql = "select * from test";
 		when(conn.prepareStatement(stmtSql)).thenReturn(stmt);
 		when(stmt.executeUpdate()).thenReturn(1);
-		SQLTemplateDriver.create(conn).prepareStatement(stmtSql).get().executeUpdate().get().rollback();
+		SQLTemplateDriver.create(conn).prepareStatement(stmtSql).get().executeUpdate().get().rollback().get();
 		verify(conn, times(1)).rollback();
 	}
 }
