@@ -1,4 +1,4 @@
-# SQLTemplate 1.4.0
+# SQLTemplate 1.5.0
 
 SQLTemplate implements a fluent interface for executing SQL statements.
 
@@ -14,7 +14,7 @@ If you are using Maven, add a dependency in your POM:
     <dependency>
         <groupId>com.nextbreakpoint</groupId>
         <artifactId>com.nextbreakpoint.sqltemplate</artifactId>
-        <version>1.4.0</version>
+        <version>1.5.0</version>
     </dependency>
 
 If you are using other tools, check in the documentation how to install an artifact.
@@ -24,10 +24,10 @@ If you are using other tools, check in the documentation how to install an artif
 Tipical use cases are creating tables, inserting data or quering data:
 
     SQLTemplate.builder().autoCommit().statement("CREATE TABLE TEST(ID INT PRIMARY KEY, NAME VARCHAR(255))")
-        .update().build().apply(connection).get();
+        .update().build().apply(connection);
     
     SQLTemplate.builder().autoCommit().statement("INSERT INTO TEST (ID, NAME) VALUES (?, ?)")
-        .update(new Object[] { 1, "A" }).build().apply(connection).get();
+        .update(new Object[] { 1, "A" }).build().apply(connection);
 
     SQLTemplate.builder().autoCommit().statement("SELECT NAME FROM TEST")
         .query().build().apply(connection).get().stream().forEach(System.out::println));
