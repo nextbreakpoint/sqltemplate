@@ -5,19 +5,6 @@ SQLTemplate implements a fluent interface for executing SQL statements.
 SQLTemplate has been designed to simplify the execution of SQL statements in tests 
 or in any application which doesn't require complex SQL operations.
 
-## Cleaner SQL
-
-Tipical use cases are creating tables, inserting data or quering data:
-
-    SQLTemplate.builder().autoCommit().statement("CREATE TABLE TEST(ID INT PRIMARY KEY, NAME VARCHAR(255))")
-        .update().build().apply(connection).get();
-    
-    SQLTemplate.builder().autoCommit().statement("INSERT INTO TEST (ID, NAME) VALUES (?, ?)")
-        .update(new Object[] { 1, "A" }).build().apply(connection).get();
-
-    SQLTemplate.builder().autoCommit().statement("SELECT NAME FROM TEST")
-        .query().build().apply(connection).get().stream().forEach(System.out::println));
-
 ## Getting binaries
 
 SQLTemplate is available in Maven Central Repository, Bintray and GitHub. 
@@ -32,6 +19,19 @@ If you are using Maven, add a dependency in your POM:
 
 If you are using other tools, check in the documentation how to install an artifact.
   
+## Basic examples
+
+Tipical use cases are creating tables, inserting data or quering data:
+
+    SQLTemplate.builder().autoCommit().statement("CREATE TABLE TEST(ID INT PRIMARY KEY, NAME VARCHAR(255))")
+        .update().build().apply(connection).get();
+    
+    SQLTemplate.builder().autoCommit().statement("INSERT INTO TEST (ID, NAME) VALUES (?, ?)")
+        .update(new Object[] { 1, "A" }).build().apply(connection).get();
+
+    SQLTemplate.builder().autoCommit().statement("SELECT NAME FROM TEST")
+        .query().build().apply(connection).get().stream().forEach(System.out::println));
+
 ## Complete example
 
 Given the program:
