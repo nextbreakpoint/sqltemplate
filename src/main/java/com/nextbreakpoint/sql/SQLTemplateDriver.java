@@ -36,8 +36,7 @@ public class SQLTemplateDriver {
 	}
 
 	private SQLTemplateDriver(Connection conn, SQLStatement sqlStatement, SQLResult sqlResult) {
-		Objects.requireNonNull(conn);
-		this.conn = conn;
+		this.conn = Objects.requireNonNull(conn);
 		this.sqlResult = sqlResult;
 		this.sqlStatement = sqlStatement;
 	}
@@ -143,7 +142,7 @@ public class SQLTemplateDriver {
 	}
 
 	/**
-	 * Returns default mapper function. 
+	 * Returns default exception mapper function.
 	 * @return the mapper
 	 */
 	public static Function<Exception, SQLTemplateException> defaultMapper() {
@@ -151,10 +150,10 @@ public class SQLTemplateDriver {
 	}
 
 	/**
-	 * Attempts to execute the callable.
+	 * Returns a Try manod for executing given callable.
 	 * @param callable the callable
 	 * @param <R> the value type
-	 * @return the result
+	 * @return the monad
 	 */
 	public static <R> Try<R, SQLTemplateException> tryCallable(Callable<R> callable) {
 		return Try.of(callable).mapper(defaultMapper());
@@ -187,8 +186,7 @@ public class SQLTemplateDriver {
 		private final PreparedStatement st;
 
 		public SQLStatement(PreparedStatement st) {
-			Objects.requireNonNull(st);
-			this.st = st;
+			this.st = Objects.requireNonNull(st);
 		}
 
 		@Override
@@ -246,8 +244,7 @@ public class SQLTemplateDriver {
 			private final ResultSet rs;
 
 			public SQLResultQuery(ResultSet rs) {
-				Objects.requireNonNull(rs);
-				this.rs = rs;
+				this.rs = Objects.requireNonNull(rs);
 			}
 
 			@Override

@@ -2,11 +2,10 @@
 
 SQLTemplate implements a fluent interface for executing SQL statements.
 
-## Easy SQL statements
+SQLTemplate has been designed to simplify the execution of SQL statements in tests 
+or in any application which doesn't require complex SQL operations.
 
-SQLTemplate has been designed for executing SQL statements in tests removing the complexity of handling JDBC exceptions.
-
-Statements are represented as a chain of operations which are applied to a JDBC connection.
+## Cleaner SQL
 
 Tipical use cases are creating tables, inserting data or quering data:
 
@@ -19,7 +18,21 @@ Tipical use cases are creating tables, inserting data or quering data:
     SQLTemplate.builder().autoCommit().statement("SELECT NAME FROM TEST")
         .query().build().apply(connection).get().stream().forEach(System.out::println));
 
-## Other examples
+## Getting binaries
+
+SQLTemplate is available in Maven Central Repository, Bintray and GitHub. 
+
+If you are using Maven, add a dependency in your POM:
+
+    <dependency>
+        <groupId>com.nextbreakpoint</groupId>
+        <artifactId>com.nextbreakpoint.sqltemplate</artifactId>
+        <version>1.4.0</version>
+    </dependency>
+
+If you are using other tools, check in the documentation how to install an artifact.
+  
+## Complete example
 
 Given the program:
 
