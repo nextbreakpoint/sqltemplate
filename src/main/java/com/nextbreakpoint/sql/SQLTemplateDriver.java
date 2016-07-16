@@ -89,7 +89,7 @@ public class SQLTemplateDriver {
 	 * @return the result
 	 */
 	public Try<SQLTemplateDriver, SQLTemplateException> executeUpdate(Object[] params) {
-		return tryCallable(() -> sqlStatement.executeUpdate(params).map(res -> create(conn, sqlStatement, SQLResult.of(res))).getOrThrow());
+		return tryCallable(() -> sqlStatement.executeUpdate(params).map(res -> create(conn, sqlStatement, SQLResult.of(res))).orThrow());
 	}
 
 	/**
@@ -98,7 +98,7 @@ public class SQLTemplateDriver {
 	 * @return the result
 	 */
 	public Try<SQLTemplateDriver, SQLTemplateException> executeQuery(Object[] params) {
-		return tryCallable(() -> sqlStatement.executeQuery(params).map(res -> create(conn, sqlStatement, SQLResult.of(res))).getOrThrow());
+		return tryCallable(() -> sqlStatement.executeQuery(params).map(res -> create(conn, sqlStatement, SQLResult.of(res))).orThrow());
 	}
 
 	/**
@@ -275,7 +275,7 @@ public class SQLTemplateDriver {
 						} else {
 							return false;
 						}
-					}).getOrElse(false);
+					}).orElse(false);
 				}
 
 				private void bindColumns(ResultSet rs, Object[] columns) throws Exception {

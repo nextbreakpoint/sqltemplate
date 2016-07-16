@@ -1,6 +1,6 @@
 # SQLTemplate 1.4.0
 
-SQLTemplate implements a fluent API for executing SQL statements
+SQLTemplate implements a fluent interface for executing SQL statements.
 
 ## Easy SQL statements
 
