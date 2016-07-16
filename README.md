@@ -1,25 +1,38 @@
-# SQLTemplate 1.3.2
+# SQLTemplate 1.4.0
 
-SQLTemplate implements a fluent API for executing SQL statements
+SQLTemplate implements a fluent interface for executing SQL statements.
 
-## Easy SQL statements
+SQLTemplate has been designed to simplify the execution of SQL statements in tests 
+or in any application which doesn't require complex SQL operations.
 
-SQLTemplate has been designed for executing SQL statements in tests removing the complexity of handling JDBC exceptions.
-
-Statements are represented as a chain of operations which are applied to a JDBC connection.
+## Cleaner SQL
 
 Tipical use cases are creating tables, inserting data or quering data:
 
     SQLTemplate.builder().autoCommit().statement("CREATE TABLE TEST(ID INT PRIMARY KEY, NAME VARCHAR(255) DEFAULT '')")
-        .update().build().apply(connection);
+        .update().build().apply(connection).get();
     
     SQLTemplate.builder().autoCommit().statement("INSERT INTO TEST (ID, NAME) VALUES (?, ?)")
-        .update(new Object[] { 1, "A" }).build().apply(connection);
+        .update(new Object[] { 1, "A" }).build().apply(connection).get();
 
     SQLTemplate.builder().autoCommit().statement("SELECT NAME FROM TEST")
         .query().build().apply(connection).get().stream().forEach(System.out::println));
 
-## Other examples
+## Getting binaries
+
+SQLTemplate is available in Maven Central Repository, Bintray and GitHub. 
+
+If you are using Maven, add a dependency in your POM:
+
+    <dependency>
+        <groupId>com.nextbreakpoint</groupId>
+        <artifactId>com.nextbreakpoint.sqltemplate</artifactId>
+        <version>1.4.0</version>
+    </dependency>
+
+If you are using other tools, check in the documentation how to install an artifact.
+  
+## Complete example
 
 Given the program:
 
@@ -62,12 +75,12 @@ Given the program:
             return Class.forName("org.h2.Driver");
         }
     
-        private static Consumer<Throwable> exceptionHandler() {
+        private static Consumer<Exception> exceptionHandler() {
             return e -> e.printStackTrace();
         }
     
         public static void main(String[] args) {
-            Try.of(SQLTemplateMain::loadDriver).flatMap(clazz -> Try.of(SQLTemplateMain::run)).onFailure(exceptionHandler());
+            Try.of(SQLTemplateMain::loadDriver).flatMap(clazz -> Try.of(SQLTemplateMain::run)).ifFailure(exceptionHandler());
         }
     }
 		

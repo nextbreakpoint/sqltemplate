@@ -23,9 +23,92 @@ public class SQLTemplateTest {
 	public ExpectedException exception = ExpectedException.none();
 
 	@Test
-	public void shouldReturnNotNull() {
+	public void shouldNotReturnNull() {
+		assertNotNull(SQLTemplate.builder().build());
+	}
+
+	@Test
+	public void shouldCallSetAutoCommitWithTrue() throws SQLException {
 		Connection conn = mock(Connection.class);
-		assertNotNull(SQLTemplate.builder());
+		SQLTemplate.builder().autoCommit().build().apply(conn).get();
+		verify(conn, times(1)).setAutoCommit(true);
+	}
+
+	@Test
+	public void shouldCallSetAutoCommitWithFalse() throws SQLException {
+		Connection conn = mock(Connection.class);
+		SQLTemplate.builder().noAutoCommit().build().apply(conn).get();
+		verify(conn, times(1)).setAutoCommit(false);
+	}
+
+	@Test
+	public void shouldCallCommit() throws SQLException {
+		Connection conn = mock(Connection.class);
+		SQLTemplate.builder().commit().build().apply(conn).get();
+		verify(conn, times(1)).commit();
+	}
+
+	@Test
+	public void shouldCallRollback() throws SQLException {
+		Connection conn = mock(Connection.class);
+		SQLTemplate.builder().rollback().build().apply(conn).get();
+		verify(conn, times(1)).rollback();
+	}
+
+	@Test
+	public void shouldCallPrepareStatement() throws SQLException {
+		Connection conn = mock(Connection.class);
+		ResultSet rs = mock(ResultSet.class);
+		PreparedStatement stmt = mock(PreparedStatement.class);
+		when(conn.prepareStatement("SELECT * FROM TEST")).thenReturn(stmt);
+		when(stmt.executeQuery()).thenReturn(rs);
+		SQLTemplate.builder().statement("SELECT * FROM TEST").build().apply(conn).get();
+		verify(conn, times(1)).prepareStatement("SELECT * FROM TEST");
+	}
+
+	@Test
+	public void shouldCallExecuteUpdate() throws SQLException {
+		Connection conn = mock(Connection.class);
+		PreparedStatement stmt = mock(PreparedStatement.class);
+		when(conn.prepareStatement("XXX")).thenReturn(stmt);
+		SQLTemplate.builder().statement("XXX").update().build().apply(conn).get();
+		verify(stmt, times(1)).executeUpdate();
+	}
+
+	@Test
+	public void shouldCallExecuteQuery() throws SQLException {
+		Connection conn = mock(Connection.class);
+		PreparedStatement stmt = mock(PreparedStatement.class);
+		ResultSet rs = mock(ResultSet.class);
+		when(conn.prepareStatement("XXX")).thenReturn(stmt);
+		when(stmt.executeQuery()).thenReturn(rs);
+		SQLTemplate.builder().statement("XXX").query().build().apply(conn).get();
+		verify(stmt, times(1)).executeQuery();
+	}
+
+	@Test
+	public void shouldCallExecuteUpdateWithParameters() throws SQLException {
+		Connection conn = mock(Connection.class);
+		PreparedStatement stmt = mock(PreparedStatement.class);
+		when(conn.prepareStatement("XXX")).thenReturn(stmt);
+		when(stmt.executeUpdate()).thenReturn(1);
+		SQLTemplate.builder().statement("XXX").update(new String[] {"X", "Y"}).build().apply(conn).get();
+		verify(stmt, times(1)).setObject(1, "X");
+		verify(stmt, times(1)).setObject(2, "Y");
+		verify(stmt, times(1)).executeUpdate();
+	}
+
+	@Test
+	public void shouldCallExecuteQueryWithParameters() throws SQLException {
+		Connection conn = mock(Connection.class);
+		PreparedStatement stmt = mock(PreparedStatement.class);
+		ResultSet rs = mock(ResultSet.class);
+		when(conn.prepareStatement("XXX")).thenReturn(stmt);
+		when(stmt.executeQuery()).thenReturn(rs);
+		SQLTemplate.builder().statement("XXX").query(new String[] {"X", "Y"}).build().apply(conn).get();
+		verify(stmt, times(1)).setObject(1, "X");
+		verify(stmt, times(1)).setObject(2, "Y");
+		verify(stmt, times(1)).executeQuery();
 	}
 
 	@Test
@@ -80,10 +163,8 @@ public class SQLTemplateTest {
 		when(rs.getMetaData()).thenReturn(meta);
 		when(rs.getObject(1)).thenReturn(1L);
 		when(rs.getObject(2)).thenReturn("a");
-		Try<List<Object[]>, SQLTemplateException> template = SQLTemplate.builder().statement(stmtSql).query().build().apply(conn);
-		assertFalse(template.isFailure());
-		assertNotNull(template.get());
-		Object[] findFirst = template.get().get(0);
+		List<Object[]> result = SQLTemplate.builder().statement(stmtSql).query().build().apply(conn).get();
+		Object[] findFirst = result.get(0);
 		assertEquals(1L, findFirst[0]);
 		assertEquals("a", findFirst[1]);
 	}
@@ -105,7 +186,7 @@ public class SQLTemplateTest {
 	}
 
 	@Test
-	public void shouldReturnFailureWhenSetCommitThrowsException() throws Exception {
+	public void shouldReturnFailureWhenCommitThrowsException() throws Exception {
 		Connection conn = mock(Connection.class);
 		doThrow(SQLException.class).when(conn).commit();
 		Try<List<Object[]>, SQLTemplateException> template = SQLTemplate.builder().commit().build().apply(conn);
@@ -113,7 +194,7 @@ public class SQLTemplateTest {
 	}
 
 	@Test
-	public void shouldReturnFailureWhenSetRollbackThrowsException() throws Exception {
+	public void shouldReturnFailureWhenRollbackThrowsException() throws Exception {
 		Connection conn = mock(Connection.class);
 		doThrow(SQLException.class).when(conn).rollback();
 		Try<List<Object[]>, SQLTemplateException> template = SQLTemplate.builder().rollback().build().apply(conn);

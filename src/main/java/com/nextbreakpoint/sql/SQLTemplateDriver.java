@@ -36,8 +36,7 @@ public class SQLTemplateDriver {
 	}
 
 	private SQLTemplateDriver(Connection conn, SQLStatement sqlStatement, SQLResult sqlResult) {
-		Objects.requireNonNull(conn);
-		this.conn = conn;
+		this.conn = Objects.requireNonNull(conn);
 		this.sqlResult = sqlResult;
 		this.sqlStatement = sqlStatement;
 	}
@@ -89,7 +88,7 @@ public class SQLTemplateDriver {
 	 * @return the result
 	 */
 	public Try<SQLTemplateDriver, SQLTemplateException> executeUpdate(Object[] params) {
-		return tryCallable(() -> sqlStatement.executeUpdate(params).map(res -> create(conn, sqlStatement, SQLResult.of(res))).getOrThrow());
+		return tryCallable(() -> sqlStatement.executeUpdate(params).map(res -> create(conn, sqlStatement, SQLResult.of(res))).orThrow());
 	}
 
 	/**
@@ -98,7 +97,7 @@ public class SQLTemplateDriver {
 	 * @return the result
 	 */
 	public Try<SQLTemplateDriver, SQLTemplateException> executeQuery(Object[] params) {
-		return tryCallable(() -> sqlStatement.executeQuery(params).map(res -> create(conn, sqlStatement, SQLResult.of(res))).getOrThrow());
+		return tryCallable(() -> sqlStatement.executeQuery(params).map(res -> create(conn, sqlStatement, SQLResult.of(res))).orThrow());
 	}
 
 	/**
@@ -143,21 +142,21 @@ public class SQLTemplateDriver {
 	}
 
 	/**
-	 * Returns default mapper function. 
+	 * Returns default exception mapper function.
 	 * @return the mapper
 	 */
-	public static Function<Throwable, SQLTemplateException> defaultMapper() {
+	public static Function<Exception, SQLTemplateException> defaultMapper() {
 		return e -> (e instanceof SQLTemplateException) ? (SQLTemplateException)e : new SQLTemplateException("SQL template error", e);
 	}
 
 	/**
-	 * Attempts to execute the callable.
+	 * Returns a Try manod for executing given callable.
 	 * @param callable the callable
 	 * @param <R> the value type
-	 * @return the result
+	 * @return the monad
 	 */
 	public static <R> Try<R, SQLTemplateException> tryCallable(Callable<R> callable) {
-		return Try.of(defaultMapper(), callable);
+		return Try.of(callable).mapper(defaultMapper());
 	}
 
 	private static SQLTemplateDriver create(Connection conn, SQLStatement sqlStatement, SQLResult sqlResult) {
@@ -187,8 +186,7 @@ public class SQLTemplateDriver {
 		private final PreparedStatement st;
 
 		public SQLStatement(PreparedStatement st) {
-			Objects.requireNonNull(st);
-			this.st = st;
+			this.st = Objects.requireNonNull(st);
 		}
 
 		@Override
@@ -246,8 +244,7 @@ public class SQLTemplateDriver {
 			private final ResultSet rs;
 
 			public SQLResultQuery(ResultSet rs) {
-				Objects.requireNonNull(rs);
-				this.rs = rs;
+				this.rs = Objects.requireNonNull(rs);
 			}
 
 			@Override
@@ -275,7 +272,7 @@ public class SQLTemplateDriver {
 						} else {
 							return false;
 						}
-					}).getOrElse(false);
+					}).orElse(false);
 				}
 
 				private void bindColumns(ResultSet rs, Object[] columns) throws Exception {

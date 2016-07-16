@@ -52,11 +52,11 @@ public class SQLTemplateMain {
 		return Class.forName("org.h2.Driver");
 	}
 
-	private static Consumer<Throwable> exceptionHandler() {
+	private static Consumer<Exception> exceptionHandler() {
 		return e -> e.printStackTrace();
 	}
 
 	public static void main(String[] args) {
-		Try.of(SQLTemplateMain::loadDriver).flatMap(clazz -> Try.of(SQLTemplateMain::run)).onFailure(exceptionHandler());
+		Try.of(SQLTemplateMain::loadDriver).flatMap(clazz -> Try.of(SQLTemplateMain::run)).ifFailure(exceptionHandler());
 	}
 }
