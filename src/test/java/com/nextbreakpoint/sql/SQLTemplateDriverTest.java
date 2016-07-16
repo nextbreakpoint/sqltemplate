@@ -1,9 +1,3 @@
-/*
- * This file is part of SQLDriver
- * 
- * Copyright (c) 2016, Andrea Medeghini
- * All rights reserved.
- */
 package com.nextbreakpoint.sql;
 
 import org.junit.Rule;
