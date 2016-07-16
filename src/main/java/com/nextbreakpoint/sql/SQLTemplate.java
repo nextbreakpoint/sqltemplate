@@ -32,7 +32,7 @@ public class SQLTemplate {
 	 */
 	public Try<List<Object[]>, SQLTemplateException> apply(Connection connection) {
 		return operation.apply(SQLTemplateDriver.create(connection))
-				.flatMap(SQLTemplateDriver::fetch).map(SQLTemplateDriver::values);
+				.flatMap(SQLTemplateDriver::fetch).map(SQLTemplateDriver::values).execute();
 	}
 
 	/**

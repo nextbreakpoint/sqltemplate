@@ -30,28 +30,28 @@ public class SQLTemplateTest {
 	@Test
 	public void shouldCallSetAutoCommitWithTrue() throws SQLException {
 		Connection conn = mock(Connection.class);
-		SQLTemplate.builder().autoCommit().build().apply(conn).get();
+		SQLTemplate.builder().autoCommit().build().apply(conn);
 		verify(conn, times(1)).setAutoCommit(true);
 	}
 
 	@Test
 	public void shouldCallSetAutoCommitWithFalse() throws SQLException {
 		Connection conn = mock(Connection.class);
-		SQLTemplate.builder().noAutoCommit().build().apply(conn).get();
+		SQLTemplate.builder().noAutoCommit().build().apply(conn);
 		verify(conn, times(1)).setAutoCommit(false);
 	}
 
 	@Test
 	public void shouldCallCommit() throws SQLException {
 		Connection conn = mock(Connection.class);
-		SQLTemplate.builder().commit().build().apply(conn).get();
+		SQLTemplate.builder().commit().build().apply(conn);
 		verify(conn, times(1)).commit();
 	}
 
 	@Test
 	public void shouldCallRollback() throws SQLException {
 		Connection conn = mock(Connection.class);
-		SQLTemplate.builder().rollback().build().apply(conn).get();
+		SQLTemplate.builder().rollback().build().apply(conn);
 		verify(conn, times(1)).rollback();
 	}
 
@@ -62,7 +62,7 @@ public class SQLTemplateTest {
 		PreparedStatement stmt = mock(PreparedStatement.class);
 		when(conn.prepareStatement("SELECT * FROM TEST")).thenReturn(stmt);
 		when(stmt.executeQuery()).thenReturn(rs);
-		SQLTemplate.builder().statement("SELECT * FROM TEST").build().apply(conn).get();
+		SQLTemplate.builder().statement("SELECT * FROM TEST").build().apply(conn);
 		verify(conn, times(1)).prepareStatement("SELECT * FROM TEST");
 	}
 
@@ -71,7 +71,7 @@ public class SQLTemplateTest {
 		Connection conn = mock(Connection.class);
 		PreparedStatement stmt = mock(PreparedStatement.class);
 		when(conn.prepareStatement("XXX")).thenReturn(stmt);
-		SQLTemplate.builder().statement("XXX").update().build().apply(conn).get();
+		SQLTemplate.builder().statement("XXX").update().build().apply(conn);
 		verify(stmt, times(1)).executeUpdate();
 	}
 
@@ -82,7 +82,7 @@ public class SQLTemplateTest {
 		ResultSet rs = mock(ResultSet.class);
 		when(conn.prepareStatement("XXX")).thenReturn(stmt);
 		when(stmt.executeQuery()).thenReturn(rs);
-		SQLTemplate.builder().statement("XXX").query().build().apply(conn).get();
+		SQLTemplate.builder().statement("XXX").query().build().apply(conn);
 		verify(stmt, times(1)).executeQuery();
 	}
 
@@ -92,7 +92,7 @@ public class SQLTemplateTest {
 		PreparedStatement stmt = mock(PreparedStatement.class);
 		when(conn.prepareStatement("XXX")).thenReturn(stmt);
 		when(stmt.executeUpdate()).thenReturn(1);
-		SQLTemplate.builder().statement("XXX").update(new String[] {"X", "Y"}).build().apply(conn).get();
+		SQLTemplate.builder().statement("XXX").update(new String[] {"X", "Y"}).build().apply(conn);
 		verify(stmt, times(1)).setObject(1, "X");
 		verify(stmt, times(1)).setObject(2, "Y");
 		verify(stmt, times(1)).executeUpdate();
@@ -105,7 +105,7 @@ public class SQLTemplateTest {
 		ResultSet rs = mock(ResultSet.class);
 		when(conn.prepareStatement("XXX")).thenReturn(stmt);
 		when(stmt.executeQuery()).thenReturn(rs);
-		SQLTemplate.builder().statement("XXX").query(new String[] {"X", "Y"}).build().apply(conn).get();
+		SQLTemplate.builder().statement("XXX").query(new String[] {"X", "Y"}).build().apply(conn);
 		verify(stmt, times(1)).setObject(1, "X");
 		verify(stmt, times(1)).setObject(2, "Y");
 		verify(stmt, times(1)).executeQuery();
@@ -142,10 +142,10 @@ public class SQLTemplateTest {
 		String stmtSql = "select * from test";
 		when(conn.prepareStatement(stmtSql)).thenReturn(stmt);
 		when(stmt.executeUpdate()).thenReturn(10);
-		Try<List<Object[]>, SQLTemplateException> template = SQLTemplate.builder().statement(stmtSql).update().build().apply(conn);
-		assertFalse(template.isFailure());
-		assertNotNull(template.get());
-		assertEquals(10L, template.get().get(0)[0]);
+		Try<List<Object[]>, SQLTemplateException> result = SQLTemplate.builder().statement(stmtSql).update().build().apply(conn);
+		assertFalse(result.isFailure());
+		assertNotNull(result.get());
+		assertEquals(10L, result.get().get(0)[0]);
 	}
 
 	@Test
@@ -163,8 +163,9 @@ public class SQLTemplateTest {
 		when(rs.getMetaData()).thenReturn(meta);
 		when(rs.getObject(1)).thenReturn(1L);
 		when(rs.getObject(2)).thenReturn("a");
-		List<Object[]> result = SQLTemplate.builder().statement(stmtSql).query().build().apply(conn).get();
-		Object[] findFirst = result.get(0);
+		Try<List<Object[]>, SQLTemplateException> result = SQLTemplate.builder().statement(stmtSql).query().build().apply(conn);
+		assertFalse(result.isFailure());
+		Object[] findFirst = result.get().get(0);
 		assertEquals(1L, findFirst[0]);
 		assertEquals("a", findFirst[1]);
 	}
