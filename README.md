@@ -9,7 +9,7 @@ or in any application which doesn't require complex SQL operations.
 
 Tipical use cases are creating tables, inserting data or quering data:
 
-    SQLTemplate.builder().autoCommit().statement("CREATE TABLE TEST(ID INT PRIMARY KEY, NAME VARCHAR(255) DEFAULT '')")
+    SQLTemplate.builder().autoCommit().statement("CREATE TABLE TEST(ID INT PRIMARY KEY, NAME VARCHAR(255))")
         .update().build().apply(connection).get();
     
     SQLTemplate.builder().autoCommit().statement("INSERT INTO TEST (ID, NAME) VALUES (?, ?)")
