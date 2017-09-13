@@ -1,4 +1,4 @@
-# SQLTemplate 1.5.0
+# SQLTemplate 1.5.1
 
 SQLTemplate implements a fluent interface for executing SQL statements.
 
@@ -13,7 +13,7 @@ If you are using Maven, add a dependency in your POM:
     <dependency>
         <groupId>com.nextbreakpoint</groupId>
         <artifactId>com.nextbreakpoint.sqltemplate</artifactId>
-        <version>1.5.0</version>
+        <version>1.5.1</version>
     </dependency>
 
 If you are using other tools, please consult tool's documentation.
