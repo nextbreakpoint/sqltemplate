@@ -29,7 +29,6 @@ public class SQLTemplateIT {
 	@Before
 	public void setupConnection() throws Exception {
 		conn = DriverManager.getConnection("jdbc:h2:~/test", "sa", "");
-		conn.prepareStatement("DELETE TEST").executeUpdate();
 	}
 
 	@After
