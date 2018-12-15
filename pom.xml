@@ -3,7 +3,7 @@
 	<modelVersion>4.0.0</modelVersion>
 	<groupId>com.nextbreakpoint</groupId>
 	<artifactId>com.nextbreakpoint.sqltemplate</artifactId>
-	<version>1.5.1</version>
+	<version>1.5.2</version>
 	<packaging>jar</packaging>
 	<name>SQLTemplate</name>
 	<description>SQLTemplate implements a fluent interface for executing SQL statements</description>
@@ -85,6 +85,18 @@
 					</includes>
 				</configuration>
 			</plugin>
+			<plugin>
+			  <groupId>org.apache.maven.plugins</groupId>
+			  <artifactId>maven-jar-plugin</artifactId>
+				<version>3.1.0</version>
+			  <configuration>
+			    <archive>
+			      <manifestEntries>
+			        <Automatic-Module-Name>com.nextbreakpoint.sqltemplate</Automatic-Module-Name>
+			      </manifestEntries>
+			    </archive>
+			  </configuration>
+			</plugin>
 		</plugins>
 	</build>
 	<dependencies>
@@ -126,7 +138,7 @@
 					<plugin>
 						<groupId>org.apache.maven.plugins</groupId>
 						<artifactId>maven-gpg-plugin</artifactId>
-						<version>1.5</version>
+						<version>1.6</version>
 						<executions>
 							<execution>
 								<id>sign-artifacts</id>
